@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌾 نظام التوصيات الزراعية الذكي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-deep: #1a3a1a;
+  --green-mid: #2d6a2d;
+  --green-light: #4a9e4a;
+  --green-bright: #6fcf6f;
+  --gold: #c9a227;
+  --gold-light: #f0cc5a;
+  --sand: #f5e6c8;
+  --sand-light: #fdf6e8;
+  --brown: #6b4c1e;
+  --soil: #8b5e3c;
+  --sky: #e8f4f8;
+  --white: #ffffff;
+  --shadow: rgba(26,58,26,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--sand-light);
+  min-height: 100vh;
+  color: var(--green-deep);
+  direction: rtl;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: linear-gradient(135deg, var(--green-deep) 0%, #2a5a2a 50%, var(--green-mid) 100%);
+  padding: 40px 20px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234a9e4a' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.header-title {
+  font-family: 'Amiri', serif;
+  font-size: clamp(28px, 5vw, 52px);
+  color: var(--gold-light);
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+  position: relative;
+  letter-spacing: 1px;
+}
+.header-sub {
+  color: rgba(255,255,255,0.8);
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 300;
+  position: relative;
+}
+.header-icons {
+  font-size: 40px;
+  margin-bottom: 15px;
+  position: relative;
+  animation: sway 3s ease-in-out infinite;
+}
+@keyframes sway { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)} }
+
+.wave {
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 40px;
+  background: var(--sand-light);
+  clip-path: ellipse(55% 100% at 50% 100%);
+}
+
+/* ===== PROGRESS STEPS ===== */
+.steps-bar {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 30px 20px 20px;
+  flex-wrap: wrap;
+}
+.step-dot {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #ccc;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+  transition: all 0.3s;
+  cursor: default;
+  position: relative;
+}
+.step-dot.active { background: var(--green-mid); transform: scale(1.15); }
+.step-dot.done { background: var(--green-bright); }
+.step-dot::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: -20px;
+  font-size: 9px;
+  color: var(--green-deep);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* ===== MAIN CARD ===== */
+.main-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 35px;
+  box-shadow: 0 8px 40px var(--shadow);
+  margin-bottom: 24px;
+  border: 1px solid rgba(74,158,74,0.1);
+  animation: slideIn 0.4s ease;
+}
+@keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--sand);
+}
+.step-icon {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--green-mid), var(--green-bright));
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(45,106,45,0.3);
+}
+.step-title { font-size: 20px; font-weight: 700; color: var(--green-deep); }
+.step-subtitle { font-size: 13px; color: #888; margin-top: 2px; }
+
+/* ===== FORM ELEMENTS ===== */
+label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--green-deep); font-size: 15px; }
+
+select, input[type=number] {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 15px;
+  color: var(--green-deep);
+  background: var(--sand-light);
+  transition: all 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+select:focus, input[type=number]:focus {
+  outline: none;
+  border-color: var(--green-mid);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(45,106,45,0.1);
+}
+.select-wrapper { position: relative; }
+.select-wrapper::after {
+  content: '▼';
+  position: absolute;
+  left: 16px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--green-mid);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+/* ===== RADIO GRID ===== */
+.radio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+.radio-item input { display: none; }
+.radio-item label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s;
+  background: var(--sand-light);
+  margin: 0;
+  text-align: center;
+}
+.radio-item label .r-icon { font-size: 26px; margin-bottom: 6px; }
+.radio-item label .r-text { font-size: 13px; font-weight: 600; }
+.radio-item label .r-sub { font-size: 11px; color: #888; margin-top: 2px; }
+.radio-item input:checked + label {
+  border-color: var(--green-mid);
+  background: linear-gradient(135deg, rgba(45,106,45,0.08), rgba(74,158,74,0.06));
+  box-shadow: 0 4px 14px rgba(45,106,45,0.18);
+  transform: translateY(-2px);
+}
+.radio-item label:hover { border-color: var(--green-light); transform: translateY(-1px); }
+
+/* ===== MONTH PILLS ===== */
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.month-item input { display: none; }
+.month-item label {
+  display: block;
+  padding: 10px 4px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--sand-light);
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+.month-item input:checked + label {
+  border-color: var(--green-mid);
+  background: var(--green-mid);
+  color: white;
+}
+.month-item label:hover { border-color: var(--green-light); }
+
+/* ===== BUTTONS ===== */
+.btn {
+  padding: 16px 36px;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+  color: white;
+  box-shadow: 0 6px 20px rgba(45,106,45,0.35);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,106,45,0.45); }
+.btn-secondary {
+  background: var(--sand);
+  color: var(--green-deep);
+}
+.btn-secondary:hover { background: #e8d9b8; }
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--green-deep);
+  box-shadow: 0 6px 20px rgba(201,162,39,0.35);
+}
+.btn-gold:hover { transform: translateY(-2px); }
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+/* ===== RESULTS ===== */
+.results-header {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+  border-radius: 20px;
+  color: white;
+  margin-bottom: 24px;
+}
+.results-header h2 { font-family: 'Amiri', serif; font-size: 32px; color: var(--gold-light); }
+.results-summary {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.summary-badge {
+  background: rgba(255,255,255,0.15);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.rec-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 6px 30px var(--shadow);
+  margin-bottom: 20px;
+  border: 1px solid rgba(74,158,74,0.12);
+  animation: slideIn 0.4s ease both;
+}
+.rec-card:nth-child(2) { animation-delay: 0.1s; }
+.rec-card:nth-child(3) { animation-delay: 0.2s; }
+.rec-card:nth-child(4) { animation-delay: 0.3s; }
+.rec-card:nth-child(5) { animation-delay: 0.4s; }
+
+.rec-header {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.rec-header:hover { background: rgba(74,158,74,0.04); }
+
+.rank-badge {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900;
+  color: white; flex-shrink: 0;
+}
+.rank-1 { background: linear-gradient(135deg, #c9a227, #f0cc5a); color: var(--green-deep); }
+.rank-2 { background: linear-gradient(135deg, #9e9e9e, #bdbdbd); }
+.rank-3 { background: linear-gradient(135deg, #8b5e3c, #a97c50); }
+.rank-4, .rank-5 { background: linear-gradient(135deg, var(--green-mid), var(--green-bright)); }
+
+.rec-title { flex: 1; }
+.rec-title h3 { font-size: 20px; font-weight: 700; color: var(--green-deep); }
+.rec-title .cat-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.score-ring {
+  position: relative;
+  width: 64px; height: 64px; flex-shrink: 0;
+}
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring .score-text {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 900;
+  color: var(--green-deep);
+}
+
+.rec-body {
+  padding: 0 24px 24px;
+  display: none;
+}
+.rec-body.open { display: block; }
+
+.rec-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.stat-box {
+  background: var(--sand-light);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  border: 1px solid rgba(74,158,74,0.12);
+}
+.stat-box .stat-val { font-size: 20px; font-weight: 800; color: var(--green-mid); }
+.stat-box .stat-label { font-size: 12px; color: #888; margin-top: 3px; }
+
+.explanation {
+  background: linear-gradient(135deg, rgba(74,158,74,0.05), rgba(201,162,39,0.05));
+  border-right: 4px solid var(--green-mid);
+  border-radius: 0 12px 12px 0;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.explanation h4 {
+  color: var(--green-deep);
+  font-size: 15px;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.exp-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.exp-item .exp-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.exp-item.good .exp-text { color: #2d6a2d; }
+.exp-item.warn .exp-text { color: #856404; }
+.exp-item.info .exp-text { color: #1a3a6b; }
+
+.diseases-section {
+  background: rgba(220,50,50,0.05);
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid rgba(220,50,50,0.1);
+}
+.diseases-section h4 { color: #c0392b; font-size: 14px; margin-bottom: 8px; display: flex; gap: 6px; align-items: center; }
+.disease-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(220,50,50,0.1);
+  border-radius: 20px;
+  font-size: 12px;
+  color: #c0392b;
+  margin: 3px;
+}
+
+.rotation-banner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  font-size: 14px; font-weight: 600;
+}
+.rotation-banner.good { background: rgba(74,158,74,0.1); color: #2d6a2d; border: 1px solid rgba(74,158,74,0.2); }
+.rotation-banner.warn { background: rgba(201,162,39,0.1); color: #856404; border: 1px solid rgba(201,162,39,0.2); }
+
+/* ===== CALENDAR SECTION ===== */
+.calendar-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--sand-light);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.cal-label { font-size: 13px; font-weight: 600; color: #666; min-width: 80px; }
+.cal-months { display: flex; gap: 4px; flex-wrap: wrap; }
+.cal-month {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.cal-plant { background: var(--green-mid); color: white; }
+.cal-harvest { background: var(--gold); color: var(--green-deep); }
+
+/* ===== WEATHER WIDGET ===== */
+.weather-widget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #e8f4f8, #d4edf6);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  border: 1px solid #b8dde8;
+}
+.weather-icon { font-size: 32px; }
+.weather-info h4 { font-size: 15px; font-weight: 700; color: #1a3a6b; }
+.weather-info p { font-size: 13px; color: #555; }
+
+/* ===== LOADING ===== */
+.loading {
+  text-align: center;
+  padding: 60px;
+  display: none;
+}
+.loading.show { display: block; }
+.spinner {
+  width: 60px; height: 60px;
+  border: 5px solid var(--sand);
+  border-top-color: var(--green-mid);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== HIDDEN ===== */
+.hidden { display: none !important; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .card { padding: 22px 18px; }
+  .month-grid { grid-template-columns: repeat(4, 1fr); }
+  .radio-grid { grid-template-columns: repeat(2, 1fr); }
+  .rec-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* category colors */
+.cat-حبوب { background: rgba(201,162,39,0.15); color: #856404; }
+.cat-خضروات { background: rgba(74,158,74,0.15); color: #2d6a2d; }
+.cat-بقوليات { background: rgba(52,152,219,0.15); color: #1a5276; }
+.cat-فاكهة { background: rgba(231,76,60,0.15); color: #922b21; }
+.cat-صناعية { background: rgba(155,89,182,0.15); color: #6c3483; }
+.cat-أعلاف { background: rgba(26,188,156,0.15); color: #0e6655; }
+.cat-توابل { background: rgba(230,126,34,0.15); color: #784212; }
+
+.info-note {
+  background: rgba(74,158,74,0.08);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #2d6a2d;
+  margin-top: 12px;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icons">🌾🌿🌱</div>
+  <h1 class="header-title">نظام التوصيات الزراعية الذكي</h1>
+  <p class="header-sub">الجزائر 🇩🇿 — 58 ولاية · 65+ محصول · دوران زراعي علمي</p>
+  <div class="wave"></div>
+</div>
+
+<div class="steps-bar" id="stepsBar">
+  <div class="step-dot active" id="sd1" data-label="الولاية">1</div>
+  <div class="step-dot" id="sd2" data-label="المساحة">2</div>
+  <div class="step-dot" id="sd3" data-label="تاريخ الزراعة">3</div>
+  <div class="step-dot" id="sd4" data-label="المحصول السابق">4</div>
+  <div class="step-dot" id="sd5" data-label="فئة المحصول">5</div>
+  <div class="step-dot" id="sd6" data-label="المياه">6</div>
+  <div class="step-dot" id="sd7" data-label="الهدف">7</div>
+  <div class="step-dot" id="sd8" data-label="الخبرة">8</div>
+  <div class="step-dot" id="sd9" data-label="النتائج">9</div>
+</div>
+
+<div class="main-container">
+
+<!-- STEP 1: WILAYA -->
+<div class="card" id="step1">
+  <div class="step-header">
+    <div class="step-icon">📍</div>
+    <div>
+      <div class="step-title">اختر الولاية</div>
+      <div class="step-subtitle">58 ولاية جزائرية</div>
+    </div>
+  </div>
+  <label>الولاية</label>
+  <div class="select-wrapper">
+    <select id="wilayaSelect">
+      <option value="">— اختر الولاية —</option>
+    </select>
+  </div>
+  <div id="wilayaInfo" style="margin-top:14px;display:none;" class="info-note"></div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="nextStep(1)">التالي ←</button></div>
+</div>
+
+<!-- STEP 2: AREA -->
+<div class="card hidden" id="step2">
+  <div class="step-header">
+    <div class="step-icon">📐</div>
+    <div>
+      <div class="step-title">مساحة الأرض</div>
+      <div class="step-subtitle">أدخل المساحة بالهكتار</div>
+    </div>
+  </div>
+  <label>المساحة (هكتار)</label>
+  <input type="number" id="farmArea" placeholder="مثال: 3.5" min="0.1" step="0.1">
+  <div class="info-note" style="margin-top:14px;">💡 1 هكتار = 10,000 متر مربع</div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="nextStep(2)">التالي ←</button>
+    <button class="btn btn-secondary" onclick="prevStep(2)">← السابق</button>
+  </div>
+</div>
+
+<!-- STEP 3: PLANTING DATE / SEASON -->
+<div class="card hidden" id="step3">
+  <div class="step-header">
+    <div class="step-icon">📅</div>
+    <div>
+      <div class="step-title">موسم الزراعة المخطط</div>
+      <div class="step-subtitle">متى تنوي البدء بالزراعة؟</div>
+    </div>
+  </div>
+  <label>اختر الشهر</label>
+  <div class="month-grid">
+    <div class="month-item"><input type="radio" name="plantMonth" id="m1" value="يناير"><label for="m1">يناير</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m2" value="فبراير"><label for="m2">فبراير</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m3" value="مارس"><label for="m3">مارس</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m4" value="أبريل"><label for="m4">أبريل</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m5" value="مايو"><label for="m5">مايو</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m6" value="يونيو"><label for="m6">يونيو</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m7" value="يوليو"><label for="m7">يوليو</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m8" value="أغسطس"><label for="m8">أغسطس</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m9" value="سبتمبر"><label for="m9">سبتمبر</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m10" value="أكتوبر"><label for="m10">أكتوبر</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m11" value="نوفمبر"><label for="m11">نوفمبر</label></div>
+    <div class="month-item"><input type="radio" name="plantMonth" id="m12" value="ديسمبر"><label for="m12">ديسمبر</label></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="nextStep(3)">التالي ←</button>
+    <button class="btn btn-secondary" onclick="prevStep(3)">← السابق</button>
+  </div>
+</div>
+
+<!-- STEP 4: PREVIOUS CROP -->
+<div class="card hidden" id="step4">
+  <div class="step-header">
+    <div class="step-icon">🔄</div>
+    <div>
+      <div class="step-title">المحصول السابق</div>
+      <div class="step-subtitle">مهم لحساب الدورة الزراعية الصحيحة</div>
+    </div>
+  </div>
+  <label>المحصول الذي زرعته في الموسم السابق</label>
+  <div class="select-wrapper">
+    <select id="prevCropSelect">
+      <option value="">— لا يوجد محصول سابق —</option>
+    </select>
+  </div>
+  <div id="rotationNote" style="margin-top:14px;"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="nextStep(4)">التالي ←</button>
+    <button class="btn btn-secondary" onclick="prevStep(4)">← السابق</button>
+  </div>
+</div>
+
+<!-- STEP 5: CATEGORY -->
+<div class="card hidden" id="step5">
+  <div class="step-header">
+    <div class="step-icon">🌱</div>
+    <div>
+      <div class="step-title">فئة المحصول</div>
+      <div class="step-subtitle">ماذا تريد أن تزرع؟</div>
+    </div>
+  </div>
+  <div class="radio-grid">
+    <div class="radio-item"><input type="radio" name="category" id="c0" value=""><label for="c0"><span class="r-icon">🌍</span><span class="r-text">جميع الفئات</span></label></div>
+    <div class="radio-item"><input type="radio" name="category" id="c1" value="حبوب"><label for="c1"><span class="r-icon">🌾</span><span class="r-text">حبوب</span></label></div>
+    <div class="radio-item"><input type="radio" name="category" id="c2" value="خضروات"><label for="c2"><span class="r-icon">🥦</span><span class="r-text">خضروات</span></label></div>
+    <div class="radio-item"><input type="radio" name="category" id="c3" value="بقوليات"><label for="c3"><span class="r-icon">🫘</span><span class="r-text">بقوليات</span></label></div>
+    <div class="radio-item"><input type="radio" name="category" id="c4" value="فاكهة"><label for="c4"><span class="r-icon">🍊</span><span class="r-text">فاكهة</span></label></div>
+    <div class="radio-item"><input type="radio" name="category" id="c5" value="محاصيل صناعية"><label for="c5"><span class="r-icon">🌻</span><span class="r-text">صناعية</span></label></div>
+    <div class="radio-item"><input type="radio" name="category" id="c6" value="أعلاف"><label for="c6"><span class="r-icon">🌿</span><span class="r-text">أعلاف</span></label></div>
+    <div class="radio-item"><input type="radio" name="category" id="c7" value="توابل وعطريات"><label for="c7"><span class="r-icon">🌿</span><span class="r-text">توابل</span></label></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="nextStep(5)">التالي ←</button>
+    <button class="btn btn-secondary" onclick="prevStep(5)">← السابق</button>
+  </div>
+</div>
+
+<!-- STEP 6: WATER -->
+<div class="card hidden" id="step6">
+  <div class="step-header">
+    <div class="step-icon">💧</div>
+    <div>
+      <div class="step-title">توفر المياه</div>
+      <div class="step-subtitle">ما هو مستوى الري في أرضك؟</div>
+    </div>
+  </div>
+  <div class="radio-grid">
+    <div class="radio-item">
+      <input type="radio" name="water" id="w1" value="منخفضة جداً">
+      <label for="w1"><span class="r-icon">🏜️</span><span class="r-text">منخفضة جداً</span><span class="r-sub">مناطق جافة</span></label>
+    </div>
+    <div class="radio-item">
+      <input type="radio" name="water" id="w2" value="منخفضة">
+      <label for="w2"><span class="r-icon">💧</span><span class="r-text">منخفضة</span><span class="r-sub">ري محدود</span></label>
+    </div>
+    <div class="radio-item">
+      <input type="radio" name="water" id="w3" value="متوسطة">
+      <label for="w3"><span class="r-icon">💧💧</span><span class="r-text">متوسطة</span><span class="r-sub">ري منتظم</span></label>
+    </div>
+    <div class="radio-item">
+      <input type="radio" name="water" id="w4" value="عالية">
+      <label for="w4"><span class="r-icon">🌊</span><span class="r-text">عالية</span><span class="r-sub">ري وفير</span></label>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="nextStep(6)">التالي ←</button>
+    <button class="btn btn-secondary" onclick="prevStep(6)">← السابق</button>
+  </div>
+</div>
+
+<!-- STEP 7: GOAL -->
+<div class="card hidden" id="step7">
+  <div class="step-header">
+    <div class="step-icon">🎯</div>
+    <div>
+      <div class="step-title">الهدف من الزراعة</div>
+      <div class="step-subtitle">ما هو هدفك الأساسي؟</div>
+    </div>
+  </div>
+  <div class="radio-grid">
+    <div class="radio-item">
+      <input type="radio" name="goal" id="g1" value="اكتفاء">
+      <label for="g1"><span class="r-icon">🏡</span><span class="r-text">اكتفاء ذاتي</span><span class="r-sub">للعائلة</span></label>
+    </div>
+    <div class="radio-item">
+      <input type="radio" name="goal" id="g2" value="بيع">
+      <label for="g2"><span class="r-icon">💰</span><span class="r-text">تجاري</span><span class="r-sub">للبيع</span></label>
+    </div>
+    <div class="radio-item">
+      <input type="radio" name="goal" id="g3" value="كلاهما">
+      <label for="g3"><span class="r-icon">⚖️</span><span class="r-text">كلاهما</span><span class="r-sub">متوازن</span></label>
+    </div>
+    <div class="radio-item">
+      <input type="radio" name="goal" id="g4" value="تصدير">
+      <label for="g4"><span class="r-icon">✈️</span><span class="r-text">تصدير</span><span class="r-sub">للخارج</span></label>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="nextStep(7)">التالي ←</button>
+    <button class="btn btn-secondary" onclick="prevStep(7)">← السابق</button>
+  </div>
+</div>
+
+<!-- STEP 8: EXPERIENCE -->
+<div class="card hidden" id="step8">
+  <div class="step-header">
+    <div class="step-icon">👨‍🌾</div>
+    <div>
+      <div class="step-title">مستوى الخبرة</div>
+      <div class="step-subtitle">كم سنة لديك في الزراعة؟</div>
+    </div>
+  </div>
+  <div class="radio-grid">
+    <div class="radio-item">
+      <input type="radio" name="experience" id="e1" value="مبتدئ">
+      <label for="e1"><span class="r-icon">🌱</span><span class="r-text">مبتدئ</span><span class="r-sub">أقل من 3 سنوات</span></label>
+    </div>
+    <div class="radio-item">
+      <input type="radio" name="experience" id="e2" value="متوسط">
+      <label for="e2"><span class="r-icon">🌿</span><span class="r-text">متوسط</span><span class="r-sub">3 - 10 سنوات</span></label>
+    </div>
+    <div class="radio-item">
+      <input type="radio" name="experience" id="e3" value="خبير">
+      <label for="e3"><span class="r-icon">🌳</span><span class="r-text">خبير</span><span class="r-sub">أكثر من 10 سنوات</span></label>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-gold" onclick="generateRecommendations()">🔍 احسب التوصيات</button>
+    <button class="btn btn-secondary" onclick="prevStep(8)">← السابق</button>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading" id="loadingDiv">
+  <div class="spinner"></div>
+  <p style="font-size:18px;color:var(--green-mid);font-weight:700;">⏳ جاري تحليل بياناتك...</p>
+  <p style="color:#888;margin-top:8px;">نقوم بمعالجة 65+ محصول و58 ولاية</p>
+</div>
+
+<!-- RESULTS -->
+<div id="resultsDiv" class="hidden">
+  <div class="results-header" id="resultsHeader"></div>
+  <div id="resultsList"></div>
+  <div style="text-align:center;margin-top:20px;">
+    <button class="btn btn-secondary" onclick="resetForm()">🔄 بحث جديد</button>
+  </div>
+</div>
+
+</div><!-- /main-container -->
+
+<script>
+// ============================================================
+// 🌾 DATABASE
+// ============================================================
+
+const WILAYAS = {
+  "أدرار":{رقم:1,lat:27.8789,lng:-0.2673,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "الشلف":{رقم:2,lat:36.1699,lng:1.3373,تربة:"طينية",منطقة:"شمالية",أمطار:"متوسطة"},
+  "الأغواط":{رقم:3,lat:33.8003,lng:2.8699,تربة:"رملية",منطقة:"شبه صحراوية",أمطار:"جافة"},
+  "أم البواقي":{رقم:4,lat:35.8667,lng:7.1167,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"متوسطة"},
+  "باتنة":{رقم:5,lat:35.5550,lng:6.1742,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"متوسطة"},
+  "بجاية":{رقم:6,lat:36.7539,lng:5.0561,تربة:"سوداء",منطقة:"شمالية",أمطار:"عالية"},
+  "بسكرة":{رقم:7,lat:34.8167,lng:5.7333,تربة:"رملية",منطقة:"شبه صحراوية",أمطار:"جافة"},
+  "بشار":{رقم:8,lat:31.6167,lng:-2.2167,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "البليدة":{رقم:9,lat:36.4833,lng:2.8333,تربة:"سوداء",منطقة:"شمالية",أمطار:"عالية"},
+  "البويرة":{رقم:10,lat:36.3667,lng:3.9000,تربة:"سوداء",منطقة:"شمالية",أمطار:"عالية"},
+  "تمنراست":{رقم:11,lat:22.7917,lng:5.5167,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "تبسة":{رقم:12,lat:35.4000,lng:8.1167,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"متوسطة"},
+  "تلمسان":{رقم:13,lat:35.2833,lng:-1.3167,تربة:"طينية",منطقة:"شمالية غربية",أمطار:"متوسطة"},
+  "تيارت":{رقم:14,lat:35.3667,lng:1.3167,تربة:"طينية",منطقة:"شمالية",أمطار:"متوسطة"},
+  "تيزي وزو":{رقم:15,lat:36.7117,lng:4.0450,تربة:"سوداء",منطقة:"شمالية",أمطار:"عالية"},
+  "الجزائر":{رقم:16,lat:36.7538,lng:3.0588,تربة:"سوداء",منطقة:"شمالية",أمطار:"متوسطة"},
+  "الجلفة":{رقم:17,lat:34.6667,lng:3.2667,تربة:"طينية رملية",منطقة:"شبه صحراوية",أمطار:"جافة"},
+  "جيجل":{رقم:18,lat:36.8167,lng:5.7667,تربة:"سوداء",منطقة:"شمالية",أمطار:"عالية جداً"},
+  "سطيف":{رقم:19,lat:36.1917,lng:5.4083,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"متوسطة"},
+  "سعيدة":{رقم:20,lat:34.8333,lng:0.1500,تربة:"طينية",منطقة:"شمالية غربية",أمطار:"متوسطة"},
+  "سكيكدة":{رقم:21,lat:36.8833,lng:6.9167,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"عالية"},
+  "سيدي بلعباس":{رقم:22,lat:35.1833,lng:-0.6417,تربة:"طينية",منطقة:"شمالية غربية",أمطار:"متوسطة"},
+  "عنابة":{رقم:23,lat:36.9000,lng:7.7600,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"عالية"},
+  "قالمة":{رقم:24,lat:36.4667,lng:7.4333,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"عالية"},
+  "قسنطينة":{رقم:25,lat:36.3650,lng:6.6147,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"متوسطة"},
+  "المدية":{رقم:26,lat:36.2667,lng:2.7667,تربة:"سوداء",منطقة:"شمالية",أمطار:"متوسطة"},
+  "مستغانم":{رقم:27,lat:35.9333,lng:0.1000,تربة:"طينية",منطقة:"شمالية غربية",أمطار:"متوسطة"},
+  "المسيلة":{رقم:28,lat:35.7167,lng:4.5667,تربة:"طينية رملية",منطقة:"شبه صحراوية",أمطار:"جافة"},
+  "معسكر":{رقم:29,lat:35.3833,lng:0.1333,تربة:"طينية",منطقة:"شمالية غربية",أمطار:"متوسطة"},
+  "ورقلة":{رقم:30,lat:31.9454,lng:5.3268,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "وهران":{رقم:31,lat:35.7333,lng:-0.6333,تربة:"طينية",منطقة:"شمالية غربية",أمطار:"متوسطة"},
+  "البيض":{رقم:32,lat:33.6667,lng:1.0000,تربة:"رملية",منطقة:"شبه صحراوية",أمطار:"جافة"},
+  "إليزي":{رقم:33,lat:26.1833,lng:8.4667,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "برج بوعريريج":{رقم:34,lat:36.0667,lng:4.7667,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"متوسطة"},
+  "بومرداس":{رقم:35,lat:36.7667,lng:3.4667,تربة:"سوداء",منطقة:"شمالية",أمطار:"متوسطة"},
+  "الطارف":{رقم:36,lat:36.7667,lng:8.3167,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"عالية"},
+  "تندوف":{رقم:37,lat:27.6667,lng:-8.0000,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "تيسمسيلت":{رقم:38,lat:35.6167,lng:1.0833,تربة:"طينية",منطقة:"شمالية",أمطار:"متوسطة"},
+  "الوادي":{رقم:39,lat:33.3667,lng:6.8667,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة"},
+  "خنشلة":{رقم:40,lat:35.4333,lng:7.1500,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"متوسطة"},
+  "سوق أهراس":{رقم:41,lat:36.2833,lng:7.9500,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"عالية"},
+  "تيبازة":{رقم:42,lat:36.5833,lng:2.4333,تربة:"سوداء",منطقة:"شمالية",أمطار:"متوسطة"},
+  "ميلة":{رقم:43,lat:36.4500,lng:6.2667,تربة:"سوداء",منطقة:"شمالية شرقية",أمطار:"متوسطة"},
+  "عين الدفلى":{رقم:44,lat:36.2667,lng:1.9667,تربة:"طينية",منطقة:"شمالية",أمطار:"متوسطة"},
+  "النعامة":{رقم:45,lat:33.2667,lng:-0.3167,تربة:"رملية",منطقة:"شبه صحراوية",أمطار:"جافة"},
+  "عين تيموشنت":{رقم:46,lat:35.3000,lng:-1.1333,تربة:"طينية",منطقة:"شمالية غربية",أمطار:"متوسطة"},
+  "غرداية":{رقم:47,lat:32.4833,lng:3.8000,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة"},
+  "رليزان":{رقم:48,lat:35.7500,lng:0.7833,تربة:"طينية",منطقة:"شمالية غربية",أمطار:"متوسطة"},
+  "تيميمون":{رقم:49,lat:29.2636,lng:0.2408,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "برج باجي مختار":{رقم:50,lat:23.0250,lng:0.9583,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "أولاد جلال":{رقم:51,lat:34.4167,lng:5.0667,تربة:"رملية",منطقة:"شبه صحراوية",أمطار:"جافة"},
+  "بني عباس":{رقم:52,lat:30.1333,lng:-2.1667,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "عين صالح":{رقم:53,lat:27.2000,lng:2.4667,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "عين قزام":{رقم:54,lat:26.6167,lng:2.3833,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "تقرت":{رقم:55,lat:33.0667,lng:6.0667,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة"},
+  "جانت":{رقم:56,lat:24.5500,lng:9.4833,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+  "المغير":{رقم:57,lat:33.9500,lng:5.9167,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة"},
+  "المنيعة":{رقم:58,lat:29.7833,lng:2.8833,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
+};
+
+const CROPS = {
+  // ====== حبوب ======
+  "القمح الصلب":{فئة:"حبوب",إنتاج:2.5,دورة:180,مياه:"منخفضة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الصدأ البني","التفحم المغطى","البياض الدقيقي"],زراعة:"أكتوبر",حصاد:"يونيو",عائلة:"Poaceae",صعوبة:"سهل",سعر:4500,تصدير:true},
+  "القمح اللين":{فئة:"حبوب",إنتاج:3.0,دورة:170,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["الصدأ الأصفر","التفحم","الأنثراكنوز"],زراعة:"نوفمبر",حصاد:"يونيو",عائلة:"Poaceae",صعوبة:"سهل",سعر:4000,تصدير:false},
+  "الشعير":{فئة:"حبوب",إنتاج:2.2,دورة:150,مياه:"منخفضة جداً",تربة:["سوداء","طينية","رملية","طينية رملية"],أمراض:["الصدأ","التفحم المجرد"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Poaceae",صعوبة:"سهل",سعر:3500,تصدير:false},
+  "الذرة الشامية":{فئة:"حبوب",إنتاج:4.5,دورة:140,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["الأنثراكنوز","البياض الدقيقي","العفن"],زراعة:"أبريل",حصاد:"سبتمبر",عائلة:"Poaceae",صعوبة:"متوسط",سعر:5000,تصدير:false},
+  "الشوفان":{فئة:"حبوب",إنتاج:1.8,دورة:160,مياه:"منخفضة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الصدأ التاجي","التفحم"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Poaceae",صعوبة:"سهل",سعر:3800,تصدير:false},
+  "الدخن":{فئة:"حبوب",إنتاج:1.5,دورة:120,مياه:"منخفضة جداً",تربة:["رملية","طينية رملية"],أمراض:["الصدأ","التفحم"],زراعة:"يونيو",حصاد:"سبتمبر",عائلة:"Poaceae",صعوبة:"سهل",سعر:3000,تصدير:false},
+  "الطرطير":{فئة:"حبوب",إنتاج:1.2,دورة:130,مياه:"منخفضة جداً",تربة:["رملية","طينية رملية"],أمراض:["الصدأ"],زراعة:"يونيو",حصاد:"أكتوبر",عائلة:"Poaceae",صعوبة:"سهل",سعر:2800,تصدير:false},
+
+  // ====== خضروات ======
+  "الطماطم":{فئة:"خضروات",إنتاج:35.0,دورة:120,مياه:"عالية",تربة:["سوداء","طينية"],أمراض:["الآفة المتأخرة","الذبول الفيوزاري","العثة"],زراعة:"فبراير",حصاد:"يونيو",عائلة:"Solanaceae",صعوبة:"متوسط",سعر:25000,تصدير:true},
+  "الفلفل":{فئة:"خضروات",إنتاج:22.0,دورة:150,مياه:"عالية",تربة:["سوداء","طينية"],أمراض:["الذبول","البياض الدقيقي","الفيروس الموزاييكي"],زراعة:"فبراير",حصاد:"يونيو",عائلة:"Solanaceae",صعوبة:"متوسط",سعر:40000,تصدير:true},
+  "الباذنجان":{فئة:"خضروات",إنتاج:20.0,دورة:140,مياه:"عالية",تربة:["سوداء","طينية"],أمراض:["الذبول","الحشرة الدقيقية","البياض الدقيقي"],زراعة:"مارس",حصاد:"يوليو",عائلة:"Solanaceae",صعوبة:"متوسط",سعر:20000,تصدير:false},
+  "البطاطس":{فئة:"خضروات",إنتاج:22.0,دورة:90,مياه:"متوسطة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الآفة المتأخرة","الجرب","الذبول"],زراعة:"فبراير",حصاد:"مايو",عائلة:"Solanaceae",صعوبة:"متوسط",سعر:15000,تصدير:true},
+  "الجزر":{فئة:"خضروات",إنتاج:22.0,دورة:100,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["الذبول","البياض الدقيقي","الجرب"],زراعة:"سبتمبر",حصاد:"ديسمبر",عائلة:"Apiaceae",صعوبة:"سهل",سعر:18000,تصدير:false},
+  "البصل":{فئة:"خضروات",إنتاج:20.0,دورة:120,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الصدأ الأبيض","العفن"],زراعة:"سبتمبر",حصاد:"مايو",عائلة:"Amaryllidaceae",صعوبة:"سهل",سعر:25000,تصدير:true},
+  "الثوم":{فئة:"خضروات",إنتاج:8.0,دورة:180,مياه:"منخفضة",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الصدأ","العفن"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Amaryllidaceae",صعوبة:"سهل",سعر:120000,تصدير:true},
+  "الكوسة":{فئة:"خضروات",إنتاج:25.0,دورة:60,مياه:"عالية",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الذبول","الفيروس"],زراعة:"أبريل",حصاد:"يونيو",عائلة:"Cucurbitaceae",صعوبة:"سهل",سعر:15000,تصدير:false},
+  "الخيار":{فئة:"خضروات",إنتاج:28.0,دورة:70,مياه:"عالية",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الذبول الزغبي"],زراعة:"أبريل",حصاد:"يونيو",عائلة:"Cucurbitaceae",صعوبة:"سهل",سعر:18000,تصدير:false},
+  "اللوبيا":{فئة:"خضروات",إنتاج:12.0,دورة:80,مياه:"متوسطة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الصدأ","البياض الدقيقي"],زراعة:"أبريل",حصاد:"يوليو",عائلة:"Fabaceae",صعوبة:"سهل",سعر:30000,تصدير:false},
+  "الخرشوف":{فئة:"خضروات",إنتاج:12.0,دورة:365,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الصدأ"],زراعة:"أكتوبر",حصاد:"مارس",عائلة:"Asteraceae",صعوبة:"متوسط",سعر:50000,تصدير:true},
+  "الملفوف":{فئة:"خضروات",إنتاج:25.0,دورة:100,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["العفن","الذبول","الحشرة البيضاء"],زراعة:"سبتمبر",حصاد:"يناير",عائلة:"Brassicaceae",صعوبة:"سهل",سعر:12000,تصدير:false},
+  "الخس":{فئة:"خضروات",إنتاج:15.0,دورة:60,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["البياض الزغبي","العفن"],زراعة:"سبتمبر",حصاد:"نوفمبر",عائلة:"Asteraceae",صعوبة:"سهل",سعر:20000,تصدير:false},
+  "السبانخ":{فئة:"خضروات",إنتاج:10.0,دورة:50,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["البياض الزغبي","الصدأ"],زراعة:"أكتوبر",حصاد:"ديسمبر",عائلة:"Amaranthaceae",صعوبة:"سهل",سعر:25000,تصدير:false},
+  "الكرفس":{فئة:"خضروات",إنتاج:8.0,دورة:120,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["الصدأ","البياض الدقيقي"],زراعة:"سبتمبر",حصاد:"ديسمبر",عائلة:"Apiaceae",صعوبة:"متوسط",سعر:35000,تصدير:false},
+  "اللفت":{فئة:"خضروات",إنتاج:18.0,دورة:80,مياه:"منخفضة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الذبول","العفن"],زراعة:"سبتمبر",حصاد:"ديسمبر",عائلة:"Brassicaceae",صعوبة:"سهل",سعر:10000,تصدير:false},
+  "الفجل":{فئة:"خضروات",إنتاج:15.0,دورة:40,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["العفن","البياض الزغبي"],زراعة:"سبتمبر",حصاد:"أكتوبر",عائلة:"Brassicaceae",صعوبة:"سهل",سعر:15000,تصدير:false},
+
+  // ====== بقوليات ======
+  "الفول":{فئة:"بقوليات",إنتاج:2.5,دورة:180,مياه:"منخفضة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الصدأ","الذبول الفيوزاري","البياض الدقيقي"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Fabaceae",صعوبة:"سهل",سعر:60000,تصدير:false},
+  "الحمص":{فئة:"بقوليات",إنتاج:1.8,دورة:170,مياه:"منخفضة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الذبول الفيوزاري","العفن الرمادي"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Fabaceae",صعوبة:"سهل",سعر:85000,تصدير:true},
+  "العدس":{فئة:"بقوليات",إنتاج:1.5,دورة:160,مياه:"منخفضة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الذبول","الصدأ","البياض الدقيقي"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Fabaceae",صعوبة:"سهل",سعر:100000,تصدير:true},
+  "البازلاء":{فئة:"بقوليات",إنتاج:3.5,دورة:120,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الصدأ","الذبول"],زراعة:"نوفمبر",حصاد:"مارس",عائلة:"Fabaceae",صعوبة:"سهل",سعر:45000,تصدير:false},
+  "العلس":{فئة:"بقوليات",إنتاج:1.2,دورة:180,مياه:"منخفضة",تربة:["طينية رملية","رملية"],أمراض:["الصدأ","التفحم"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Fabaceae",صعوبة:"سهل",سعر:55000,تصدير:false},
+
+  // ====== فاكهة ======
+  "الطماطم الصناعية":{فئة:"فاكهة",إنتاج:40.0,دورة:110,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["الآفة المتأخرة","الذبول"],زراعة:"مايو",حصاد:"أغسطس",عائلة:"Solanaceae",صعوبة:"متوسط",سعر:8000,تصدير:false},
+  "التمر":{فئة:"فاكهة",إنتاج:8.0,دورة:365,مياه:"منخفضة",تربة:["رملية","طينية رملية"],أمراض:["البياض الدقيقي","الذبول","حشرة الحمار"],زراعة:"سبتمبر",حصاد:"سبتمبر",عائلة:"Arecaceae",صعوبة:"خبير",سعر:300000,تصدير:true},
+  "الزيتون":{فئة:"فاكهة",إنتاج:3.5,دورة:365,مياه:"منخفضة",تربة:["سوداء","طينية","رملية","طينية رملية"],أمراض:["الذبول الرأسي","الصدأ","حشرة الزيتون"],زراعة:"نوفمبر",حصاد:"نوفمبر",عائلة:"Oleaceae",صعوبة:"سهل",سعر:120000,تصدير:true},
+  "الحمضيات":{فئة:"فاكهة",إنتاج:22.0,دورة:365,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["الصدأ","البياض الدقيقي","حشرة المجنحات"],زراعة:"نوفمبر",حصاد:"نوفمبر",عائلة:"Rutaceae",صعوبة:"متوسط",سعر:50000,تصدير:true},
+  "الشمام":{فئة:"فاكهة",إنتاج:20.0,دورة:90,مياه:"عالية",تربة:["سوداء","طينية","رملية"],أمراض:["البياض الدقيقي","الذبول"],زراعة:"أبريل",حصاد:"يوليو",عائلة:"Cucurbitaceae",صعوبة:"سهل",سعر:30000,تصدير:true},
+  "البطيخ":{فئة:"فاكهة",إنتاج:22.0,دورة:85,مياه:"عالية",تربة:["سوداء","طينية","رملية"],أمراض:["البياض الدقيقي","الذبول"],زراعة:"أبريل",حصاد:"يوليو",عائلة:"Cucurbitaceae",صعوبة:"سهل",سعر:20000,تصدير:true},
+  "العنب":{فئة:"فاكهة",إنتاج:8.0,دورة:365,مياه:"متوسطة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["البياض الزغبي","البياض الدقيقي","الصدأ"],زراعة:"فبراير",حصاد:"أغسطس",عائلة:"Vitaceae",صعوبة:"خبير",سعر:180000,تصدير:true},
+  "الرمان":{فئة:"فاكهة",إنتاج:10.0,دورة:365,مياه:"منخفضة",تربة:["سوداء","طينية","رملية"],أمراض:["الذبول","العفن"],زراعة:"فبراير",حصاد:"أكتوبر",عائلة:"Lythraceae",صعوبة:"سهل",سعر:150000,تصدير:true},
+  "التين":{فئة:"فاكهة",إنتاج:8.0,دورة:365,مياه:"منخفضة",تربة:["سوداء","طينية","رملية","طينية رملية"],أمراض:["الصدأ","البياض الدقيقي"],زراعة:"فبراير",حصاد:"أغسطس",عائلة:"Moraceae",صعوبة:"سهل",سعر:100000,تصدير:true},
+  "المشمش":{فئة:"فاكهة",إنتاج:7.0,دورة:365,مياه:"منخفضة",تربة:["سوداء","طينية"],أمراض:["الصدأ","التفحم","البياض الدقيقي"],زراعة:"فبراير",حصاد:"مايو",عائلة:"Rosaceae",صعوبة:"متوسط",سعر:120000,تصدير:true},
+  "اللوز":{فئة:"فاكهة",إنتاج:1.5,دورة:365,مياه:"منخفضة جداً",تربة:["سوداء","طينية","رملية"],أمراض:["الصدأ","البياض الدقيقي"],زراعة:"فبراير",حصاد:"أغسطس",عائلة:"Rosaceae",صعوبة:"سهل",سعر:800000,تصدير:true},
+  "الفراولة":{فئة:"فاكهة",إنتاج:12.0,دورة:180,مياه:"عالية",تربة:["سوداء","طينية"],أمراض:["رأس الرمح الرمادي","البياض الدقيقي","الذبول"],زراعة:"سبتمبر",حصاد:"مارس",عائلة:"Rosaceae",صعوبة:"خبير",سعر:250000,تصدير:true},
+
+  // ====== محاصيل صناعية ======
+  "عباد الشمس":{فئة:"محاصيل صناعية",إنتاج:2.2,دورة:130,مياه:"متوسطة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الصدأ","البياض الدقيقي","العفن الأبيض"],زراعة:"أبريل",حصاد:"أغسطس",عائلة:"Asteraceae",صعوبة:"سهل",سعر:45000,تصدير:false},
+  "الفول السوداني":{فئة:"محاصيل صناعية",إنتاج:2.0,دورة:140,مياه:"متوسطة",تربة:["رملية","طينية رملية"],أمراض:["الذبول","العفن الأبيض","البياض الدقيقي"],زراعة:"أبريل",حصاد:"أغسطس",عائلة:"Fabaceae",صعوبة:"متوسط",سعر:120000,تصدير:false},
+  "الكتان":{فئة:"محاصيل صناعية",إنتاج:1.2,دورة:100,مياه:"منخفضة",تربة:["سوداء","طينية"],أمراض:["الصدأ","الذبول"],زراعة:"مارس",حصاد:"يونيو",عائلة:"Linaceae",صعوبة:"متوسط",سعر:80000,تصدير:false},
+  "القطن":{فئة:"محاصيل صناعية",إنتاج:1.5,دورة:180,مياه:"عالية",تربة:["طينية","سوداء"],أمراض:["الذبول","البياض الدقيقي","حشرة الفوزة"],زراعة:"مايو",حصاد:"أكتوبر",عائلة:"Malvaceae",صعوبة:"خبير",سعر:100000,تصدير:true},
+
+  // ====== أعلاف ======
+  "البرسيم":{فئة:"أعلاف",إنتاج:10.0,دورة:365,مياه:"متوسطة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الذبول","الصدأ"],زراعة:"أكتوبر",حصاد:"أبريل",عائلة:"Fabaceae",صعوبة:"سهل",سعر:8000,تصدير:false},
+  "الشعير العلفي":{فئة:"أعلاف",إنتاج:4.0,دورة:100,مياه:"منخفضة",تربة:["سوداء","طينية","رملية"],أمراض:["الصدأ","التفحم"],زراعة:"سبتمبر",حصاد:"يناير",عائلة:"Poaceae",صعوبة:"سهل",سعر:5000,تصدير:false},
+  "الذرة البيضاء":{فئة:"أعلاف",إنتاج:5.0,دورة:130,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["التفحم","الذبول"],زراعة:"أبريل",حصاد:"أغسطس",عائلة:"Poaceae",صعوبة:"سهل",سعر:4000,تصدير:false},
+
+  // ====== توابل وعطريات ======
+  "الكمون":{فئة:"توابل وعطريات",إنتاج:0.8,دورة:120,مياه:"منخفضة",تربة:["رملية","طينية رملية"],أمراض:["الذبول","البياض الدقيقي"],زراعة:"فبراير",حصاد:"مايو",عائلة:"Apiaceae",صعوبة:"متوسط",سعر:400000,تصدير:true},
+  "الكزبرة":{فئة:"توابل وعطريات",إنتاج:0.8,دورة:90,مياه:"منخفضة",تربة:["سوداء","طينية","رملية"],أمراض:["الذبول","البياض الدقيقي"],زراعة:"فبراير",حصاد:"مايو",عائلة:"Apiaceae",صعوبة:"سهل",سعر:200000,تصدير:true},
+  "الشمر":{فئة:"توابل وعطريات",إنتاج:1.0,دورة:120,مياه:"منخفضة",تربة:["سوداء","طينية","رملية"],أمراض:["الذبول","الصدأ"],زراعة:"سبتمبر",حصاد:"فبراير",عائلة:"Apiaceae",صعوبة:"سهل",سعر:150000,تصدير:true},
+  "الزعفران":{فئة:"توابل وعطريات",إنتاج:0.01,دورة:365,مياه:"منخفضة",تربة:["سوداء","طينية"],أمراض:["الذبول","العفن"],زراعة:"أغسطس",حصاد:"نوفمبر",عائلة:"Iridaceae",صعوبة:"خبير",سعر:50000000,تصدير:true},
+  "النعناع":{فئة:"توابل وعطريات",إنتاج:2.0,دورة:365,مياه:"عالية",تربة:["سوداء","طينية"],أمراض:["الصدأ","البياض الدقيقي"],زراعة:"مارس",حصاد:"مايو",عائلة:"Lamiaceae",صعوبة:"سهل",سعر:80000,تصدير:false},
+  "الريحان":{فئة:"توابل وعطريات",إنتاج:1.5,دورة:90,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الذبول"],زراعة:"أبريل",حصاد:"يونيو",عائلة:"Lamiaceae",صعوبة:"سهل",سعر:100000,تصدير:false},
+};
+
+const FAMILIES = {};
+for(const [crop,d] of Object.entries(CROPS)) FAMILIES[crop] = d.عائلة || "أخرى";
+
+const INCOMPATIBLE = {
+  "Poaceae":["Poaceae"],
+  "Solanaceae":["Solanaceae"],
+  "Cucurbitaceae":["Cucurbitaceae"],
+  "Brassicaceae":["Brassicaceae"],
+};
+
+const GOOD_ROTATIONS = {
+  "Poaceae":["Fabaceae","Apiaceae"],
+  "Fabaceae":["Solanaceae","Asteraceae","Brassicaceae"],
+  "Solanaceae":["Apiaceae","Fabaceae","Poaceae"],
+  "Cucurbitaceae":["Fabaceae","Poaceae"],
+  "Brassicaceae":["Fabaceae","Poaceae"],
+};
+
+// ============================================================
+// FORM STATE
+// ============================================================
+let currentStep = 1;
+const state = {
+  wilaya: '', area: 0, plantMonth: '', prevCrop: '', category: '',
+  water: '', goal: '', experience: ''
+};
+
+// Populate selects
+function populateSelects() {
+  const ws = document.getElementById('wilayaSelect');
+  const ps = document.getElementById('prevCropSelect');
+  Object.keys(WILAYAS).sort().forEach(w => {
+    const o = new Option(`${WILAYAS[w].رقم}. ${w}`, w);
+    ws.appendChild(o);
+  });
+  Object.keys(CROPS).sort().forEach(c => {
+    ps.appendChild(new Option(c, c));
+  });
+}
+
+// Show wilaya info
+document.getElementById('wilayaSelect').addEventListener('change', function() {
+  const w = this.value;
+  const div = document.getElementById('wilayaInfo');
+  if(w && WILAYAS[w]) {
+    const d = WILAYAS[w];
+    div.style.display = 'flex';
+    div.innerHTML = `📍 <strong>${w}</strong> — تربة: <strong>${d.تربة}</strong> | منطقة: <strong>${d.منطقة}</strong> | أمطار: <strong>${d.أمطار}</strong>`;
+  } else { div.style.display = 'none'; }
+});
+
+function updateStepDots(s) {
+  for(let i=1;i<=9;i++) {
+    const d = document.getElementById(`sd${i}`);
+    d.classList.remove('active','done');
+    if(i < s) d.classList.add('done');
+    else if(i === s) d.classList.add('active');
+  }
+}
+
+function showStep(n) {
+  for(let i=1;i<=8;i++) {
+    document.getElementById(`step${i}`).classList.toggle('hidden', i!==n);
+  }
+  updateStepDots(n);
+  currentStep = n;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function nextStep(from) {
+  // Validate
+  if(from===1) {
+    state.wilaya = document.getElementById('wilayaSelect').value;
+    if(!state.wilaya) { alert('يرجى اختيار الولاية'); return; }
+  }
+  if(from===2) {
+    state.area = parseFloat(document.getElementById('farmArea').value);
+    if(!state.area || state.area<=0) { alert('يرجى إدخال مساحة صحيحة'); return; }
+  }
+  if(from===3) {
+    const m = document.querySelector('input[name="plantMonth"]:checked');
+    if(!m) { alert('يرجى اختيار شهر الزراعة'); return; }
+    state.plantMonth = m.value;
+  }
+  if(from===4) {
+    state.prevCrop = document.getElementById('prevCropSelect').value;
+  }
+  if(from===5) {
+    const c = document.querySelector('input[name="category"]:checked');
+    if(!c) { alert('يرجى اختيار فئة المحصول'); return; }
+    state.category = c.value;
+  }
+  if(from===6) {
+    const w = document.querySelector('input[name="water"]:checked');
+    if(!w) { alert('يرجى اختيار مستوى المياه'); return; }
+    state.water = w.value;
+  }
+  if(from===7) {
+    const g = document.querySelector('input[name="goal"]:checked');
+    if(!g) { alert('يرجى اختيار الهدف'); return; }
+    state.goal = g.value;
+  }
+  showStep(from+1);
+}
+
+function prevStep(from) { showStep(from-1); }
+
+// Previous crop info
+document.getElementById('prevCropSelect').addEventListener('change', function() {
+  const note = document.getElementById('rotationNote');
+  const pc = this.value;
+  if(!pc) { note.innerHTML=''; return; }
+  const fam = FAMILIES[pc];
+  const goodNext = [];
+  for(const [crop, cf] of Object.entries(FAMILIES)) {
+    if(crop === pc) continue;
+    if((INCOMPATIBLE[fam]||[]).includes(cf)) continue;
+    if((GOOD_ROTATIONS[fam]||[]).includes(cf)) goodNext.push(crop);
+  }
+  note.innerHTML = `<div class="rotation-banner good">✅ <span>بعد <strong>${pc}</strong> يُنصح بزراعة: ${goodNext.slice(0,5).join('، ')}</span></div>`;
+});
+
+// ============================================================
+// SCORING ENGINE
+// ============================================================
+function scoreCompatibility(crop, cropData, wd, state, plantMonth) {
+  let score = 0;
+  const soil = wd.تربة;
+
+  // WATER (25 pts)
+  const wmap = {"منخفضة جداً":0,"منخفضة":1,"متوسطة":2,"عالية":3};
+  const cwmap = {"منخفضة جداً":0,"منخفضة":1,"متوسطة":2,"عالية":3};
+  const userW = wmap[state.water]||1;
+  const cropW = cwmap[cropData.مياه]||1;
+  const wdiff = Math.abs(userW - cropW);
+  if(wdiff===0) score+=25; else if(wdiff===1) score+=15; else score+=5;
+
+  // SOIL (25 pts)
+  if((cropData.تربة||[]).includes(soil)) score+=25; else score+=8;
+
+  // SEASON (20 pts) — match planting month
+  const cropMonth = cropData.زراعة;
+  if(cropMonth === plantMonth) score+=20;
+  else {
+    const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+    const mi = months.indexOf(plantMonth);
+    const ci = months.indexOf(cropMonth);
+    const diff = Math.min(Math.abs(mi-ci), 12-Math.abs(mi-ci));
+    if(diff<=1) score+=15; else if(diff<=2) score+=8; else score+=2;
+  }
+
+  // EXPERIENCE (15 pts)
+  const diffMap = {"سهل":0,"متوسط":1,"خبير":2};
+  const expMap = {"مبتدئ":0,"متوسط":1,"خبير":2};
+  const cd = diffMap[cropData.صعوبة]||0;
+  const ue = expMap[state.experience]||0;
+  if(ue>=cd) score+=15; else if(ue===cd-1) score+=10; else score+=2;
+
+  // GOAL (10 pts)
+  if(state.goal==="تصدير" && cropData.تصدير) score+=10;
+  else if(state.goal==="بيع" && cropData.إنتاج>=5) score+=10;
+  else if(state.goal==="اكتفاء") score+=10;
+  else if(state.goal==="كلاهما") score+=10;
+  else score+=5;
+
+  // REGION bonus (5 pts)
+  if(wd.منطقة==="صحراوية" && (cropData.مياه==="منخفضة جداً"||cropData.مياه==="منخفضة")) score+=5;
+  else if(wd.منطقة==="شمالية" && cropData.مياه==="عالية") score+=5;
+  else score+=3;
+
+  return Math.min(score, 100);
+}
+
+function checkRotation(prevCrop, crop) {
+  if(!prevCrop) return {valid:true,msg:''};
+  if(prevCrop===crop) return {valid:false,msg:`❌ لا يُزرع ${crop} بعد نفسه`};
+  const pf = FAMILIES[prevCrop];
+  const cf = FAMILIES[crop];
+  if(pf && cf && (INCOMPATIBLE[pf]||[]).includes(cf)) return {valid:false,msg:`⛔ تعارض عائلة نباتية: لا يزرع ${crop} بعد ${prevCrop}`};
+  if(pf && cf && (GOOD_ROTATIONS[pf]||[]).includes(cf)) return {valid:true,msg:`🌟 دوران زراعي مثالي: ${crop} بعد ${prevCrop}`};
+  return {valid:true,msg:`✅ دوران مقبول: ${crop} بعد ${prevCrop}`};
+}
+
+function buildDynamicExplanation(crop, cropData, wd, state, score, rotation, weatherTemp) {
+  const items = [];
+  const soil = wd.تربة;
+
+  // Soil
+  if((cropData.تربة||[]).includes(soil)) {
+    items.push({type:'good',icon:'🌍',text:`التربة ${soil} مثالية لـ <strong>${crop}</strong> — جذوره تتأقلم بشكل ممتاز مع هذا النوع`});
+  } else {
+    items.push({type:'warn',icon:'⚠️',text:`التربة ${soil} ليست الأمثل لـ <strong>${crop}</strong> — يُنصح بإضافة سماد عضوي وتحسين بنية التربة`});
+  }
+
+  // Water
+  const wLabels = {"منخفضة جداً":"شحيحة جداً","منخفضة":"محدودة","متوسطة":"معتدلة","عالية":"وفيرة"};
+  if(cropData.مياه===state.water || (state.water==="متوسطة" && cropData.مياه==="منخفضة")) {
+    items.push({type:'good',icon:'💧',text:`احتياجات الري لـ <strong>${crop}</strong> (${cropData.مياه}) تتوافق مع توفرك المائي ${wLabels[state.water]||state.water}`});
+  } else if(state.water==="عالية" && cropData.مياه==="منخفضة") {
+    items.push({type:'warn',icon:'💧',text:`<strong>${crop}</strong> يحتاج ري منخفض — المياه الزائدة قد تسبب تعفن الجذور، استخدم ري موجّه`});
+  } else {
+    items.push({type:'warn',icon:'💧',text:`<strong>${crop}</strong> يحتاج ري ${cropData.مياه} لكن توفرك ${wLabels[state.water]||state.water} — فكّر في الري بالتنقيط`});
+  }
+
+  // Season
+  if(cropData.زراعة === state.plantMonth) {
+    items.push({type:'good',icon:'📅',text:`شهر ${state.plantMonth} هو الموعد الأمثل لزراعة <strong>${crop}</strong> — سيبدأ الحصاد في ${cropData.حصاد} بعد ${cropData.دورة} يوم`});
+  } else {
+    items.push({type:'warn',icon:'📅',text:`الموعد المثالي لزراعة <strong>${crop}</strong> هو ${cropData.زراعة}، وأنت تختار ${state.plantMonth} — قد يؤثر على الإنتاجية`});
+  }
+
+  // Experience
+  const diffMap2 = {"سهل":"مناسب للمبتدئين","متوسط":"يحتاج خبرة متوسطة","خبير":"يحتاج خبرة عالية"};
+  if(state.experience==="خبير") {
+    items.push({type:'good',icon:'👨‍🌾',text:`<strong>${crop}</strong> ${diffMap2[cropData.صعوبة]||''} — بخبرتك العالية ستتمكن من تحقيق أعلى إنتاجية ممكنة`});
+  } else if(state.experience==="مبتدئ" && cropData.صعوبة==="سهل") {
+    items.push({type:'good',icon:'👨‍🌾',text:`<strong>${crop}</strong> محصول سهل التعامل — مثالي لتطوير مهاراتك كمزارع`});
+  } else if(state.experience==="مبتدئ" && cropData.صعوبة==="خبير") {
+    items.push({type:'warn',icon:'👨‍🌾',text:`<strong>${crop}</strong> يحتاج خبرة عالية — يُنصح بالاستعانة بمرشد زراعي أو البدء بكميات صغيرة`});
+  } else {
+    items.push({type:'info',icon:'👨‍🌾',text:`<strong>${crop}</strong> ${diffMap2[cropData.صعوبة]||''} — مناسب لمستوى خبرتك`});
+  }
+
+  // Weather
+  if(weatherTemp) {
+    if(15<=weatherTemp&&weatherTemp<=28) items.push({type:'good',icon:'🌡️',text:`درجة الحرارة الحالية ${weatherTemp}°م مناسبة جداً لنمو <strong>${crop}</strong>`});
+    else if(weatherTemp>38) items.push({type:'warn',icon:'🌡️',text:`الحرارة ${weatherTemp}°م مرتفعة — استخدم تغطية ظلية وزد التروية صباحاً لحماية <strong>${crop}</strong>`});
+    else if(weatherTemp<10) items.push({type:'warn',icon:'🌡️',text:`درجة الحرارة ${weatherTemp}°م منخفضة — احمِ <strong>${crop}</strong> من الصقيع بأغطية بلاستيكية`});
+  }
+
+  // Goal
+  if(state.goal==="تصدير" && cropData.تصدير) items.push({type:'good',icon:'✈️',text:`<strong>${crop}</strong> محصول تصديري بامتياز — السوق الجزائرية والأوروبية تطلب هذا المنتج`});
+  else if(state.goal==="بيع" && cropData.إنتاج>=10) items.push({type:'good',icon:'💰',text:`<strong>${crop}</strong> ذو إنتاجية عالية (${cropData.إنتاج} طن/هكتار) — مردود تجاري ممتاز`});
+  else if(state.goal==="اكتفاء") items.push({type:'info',icon:'🏡',text:`<strong>${crop}</strong> مناسب للاكتفاء الذاتي وتوفير الغذاء لعائلتك طوال الموسم`});
+
+  // Rotation
+  if(rotation.msg) items.push({type: rotation.valid?'good':'warn', icon: rotation.valid?'🔄':'⚠️', text: rotation.msg});
+
+  return items;
+}
+
+function getCategoryColor(cat) {
+  const m = {"حبوب":"#c9a227","خضروات":"#4a9e4a","بقوليات":"#3498db","فاكهة":"#e74c3c","محاصيل صناعية":"#9b59b6","أعلاف":"#1abc9c","توابل وعطريات":"#e67e22"};
+  return m[cat]||"#888";
+}
+
+// ============================================================
+// GENERATE RECOMMENDATIONS
+// ============================================================
+async function generateRecommendations() {
+  const exp = document.querySelector('input[name="experience"]:checked');
+  if(!exp) { alert('يرجى اختيار مستوى الخبرة'); return; }
+  state.experience = exp.value;
+
+  // Hide form steps
+  for(let i=1;i<=8;i++) document.getElementById(`step${i}`).classList.add('hidden');
+  document.getElementById('resultsDiv').classList.add('hidden');
+  document.getElementById('loadingDiv').classList.add('show');
+  updateStepDots(9);
+
+  // Fetch weather
+  let weatherTemp = null;
+  try {
+    const wd = WILAYAS[state.wilaya];
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${wd.lat}&longitude=${wd.lng}&current=temperature_2m&timezone=Africa/Algiers`;
+    const r = await fetch(url, {signal: AbortSignal.timeout(4000)});
+    if(r.ok) { const d=await r.json(); weatherTemp=d.current?.temperature_2m; }
+  } catch(e) {}
+
+  // Score all crops
+  const wd = WILAYAS[state.wilaya];
+  const allScored = [];
+
+  for(const [crop, cropData] of Object.entries(CROPS)) {
+    // Filter by category
+    if(state.category && cropData.فئة !== state.category) continue;
+    // Check rotation
+    const rot = checkRotation(state.prevCrop, crop);
+    if(!rot.valid) continue;
+
+    const score = scoreCompatibility(crop, cropData, wd, state, state.plantMonth);
+    const expYield = cropData.إنتاج * state.area;
+    const expItems = buildDynamicExplanation(crop, cropData, wd, state, score, rot, weatherTemp);
+
+    allScored.push({ crop, cropData, score, expYield, rotation: rot, expItems });
+  }
+
+  // Sort by score desc, then by yield
+  allScored.sort((a,b) => b.score!==a.score ? b.score-a.score : b.expYield-a.expYield);
+
+  // Pick top 5 with variety
+  const top5 = [];
+  const usedFamilies = new Set();
+  // First pass: diverse families
+  for(const item of allScored) {
+    if(top5.length>=5) break;
+    const fam = item.cropData.عائلة||'';
+    if(!usedFamilies.has(fam) || top5.length>=3) {
+      top5.push(item);
+      usedFamilies.add(fam);
+    }
+  }
+  // Fill remaining if less than 5
+  for(const item of allScored) {
+    if(top5.length>=5) break;
+    if(!top5.includes(item)) top5.push(item);
+  }
+
+  setTimeout(() => {
+    document.getElementById('loadingDiv').classList.remove('show');
+    renderResults(top5, weatherTemp);
+  }, 800);
+}
+
+function renderResults(top5, weatherTemp) {
+  const div = document.getElementById('resultsDiv');
+  div.classList.remove('hidden');
+
+  // Header
+  const wd = WILAYAS[state.wilaya];
+  document.getElementById('resultsHeader').innerHTML = `
+    <h2>🌾 أفضل 5 محاصيل لك</h2>
+    <div class="results-summary">
+      <span class="summary-badge">📍 ${state.wilaya}</span>
+      <span class="summary-badge">📐 ${state.area} هكتار</span>
+      <span class="summary-badge">📅 زراعة ${state.plantMonth}</span>
+      <span class="summary-badge">💧 مياه ${state.water}</span>
+      <span class="summary-badge">👨‍🌾 ${state.experience}</span>
+      ${weatherTemp!==null?`<span class="summary-badge">🌡️ ${weatherTemp}°م</span>`:''}
+      ${state.prevCrop?`<span class="summary-badge">🔄 بعد ${state.prevCrop}</span>`:''}
+    </div>
+  `;
+
+  // Cards
+  const list = document.getElementById('resultsList');
+  list.innerHTML = '';
+
+  const rankIcons = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  const scoreColors = ['#c9a227','#9e9e9e','#8b5e3c','#4a9e4a','#4a9e4a'];
+
+  top5.forEach((item, idx) => {
+    const {crop, cropData, score, expYield, rotation, expItems} = item;
+    const catColor = getCategoryColor(cropData.فئة);
+    const sc = scoreColors[idx];
+    const circumference = 2*Math.PI*26;
+    const offset = circumference*(1-score/100);
+
+    const card = document.createElement('div');
+    card.className = 'rec-card';
+    card.innerHTML = `
+      <div class="rec-header" onclick="toggleCard(this)">
+        <div class="rank-badge rank-${idx+1}">${rankIcons[idx]}</div>
+        <div class="rec-title">
+          <h3>${crop}</h3>
+          <span class="cat-badge cat-${cropData.فئة.replace(/\s.*/,'')}" style="background:${catColor}22;color:${catColor}">${cropData.فئة}</span>
+        </div>
+        <div class="score-ring">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#f0f0f0" stroke-width="6"/>
+            <circle cx="32" cy="32" r="26" fill="none" stroke="${sc}" stroke-width="6"
+              stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
+          </svg>
+          <div class="score-text">${score}%</div>
+        </div>
+        <span style="color:#bbb;font-size:18px;margin-right:4px">▼</span>
+      </div>
+      <div class="rec-body ${idx===0?'open':''}">
+        ${weatherTemp!==null?`<div class="weather-widget"><div class="weather-icon">${weatherTemp>30?'☀️':weatherTemp>20?'🌤️':'🌥️'}</div><div class="weather-info"><h4>الطقس الحالي في ${state.wilaya}</h4><p>درجة الحرارة: <strong>${weatherTemp}°م</strong> | التربة: ${WILAYAS[state.wilaya].تربة} | أمطار: ${WILAYAS[state.wilaya].أمطار}</p></div></div>`:''}
+        
+        ${rotation.msg?`<div class="rotation-banner ${rotation.valid?'good':'warn'}">${rotation.msg}</div>`:''}
+        
+        <div class="rec-stats">
+          <div class="stat-box"><div class="stat-val">${expYield.toFixed(1)} طن</div><div class="stat-label">الإنتاج المتوقع</div></div>
+          <div class="stat-box"><div class="stat-val">${cropData.إنتاج}</div><div class="stat-label">طن / هكتار</div></div>
+          <div class="stat-box"><div class="stat-val">${cropData.دورة} يوم</div><div class="stat-label">دورة النمو</div></div>
+          <div class="stat-box"><div class="stat-val">${cropData.صعوبة||'—'}</div><div class="stat-label">مستوى الصعوبة</div></div>
+        </div>
+        
+        <div class="calendar-row">
+          <div class="cal-label">📅 مواعيد</div>
+          <div class="cal-months">
+            <span class="cal-month cal-plant">🌱 زراعة: ${cropData.زراعة}</span>
+            <span class="cal-month cal-harvest">🌾 حصاد: ${cropData.حصاد}</span>
+          </div>
+        </div>
+        
+        <div class="explanation">
+          <h4>🧠 لماذا هذا المحصول لك؟</h4>
+          ${expItems.map(ei=>`
+            <div class="exp-item ${ei.type}">
+              <span class="exp-icon">${ei.icon}</span>
+              <span class="exp-text">${ei.text}</span>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="diseases-section">
+          <h4>⚕️ الأمراض الشائعة وكيفية الوقاية</h4>
+          ${(cropData.أمراض||[]).map(d=>`<span class="disease-tag">⚠️ ${d}</span>`).join('')}
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleCard(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('span:last-child');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.textContent = isOpen ? '▼' : '▲';
+}
+
+function resetForm() {
+  document.getElementById('resultsDiv').classList.add('hidden');
+  document.getElementById('loadingDiv').classList.remove('show');
+  document.getElementById('wilayaSelect').value='';
+  document.getElementById('wilayaInfo').style.display='none';
+  document.getElementById('farmArea').value='';
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+  document.getElementById('prevCropSelect').value='';
+  document.getElementById('prevCropSelect').dispatchEvent(new Event('change'));
+  showStep(1);
+}
+
+// INIT
+populateSelects();
+showStep(1);
+</script>
+</body>
+</html>
