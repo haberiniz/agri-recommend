@@ -1,21 +1,3 @@
-أهلاً، لقد لاحظت المشكلة بدقة. أنت على حق تماماً، المشكلة كانت أن النظام كان يقارن شهر الزراعة الذي تختاره (مثلاً مايو) مباشرة بشهر الزراعة المثالي للمحصول (مثلاً فبراير) ويخصم نقاطاً كبيرة دون الأخذ بعين الاعتبار إمكانية الزراعة في العام القادم.
-
-كما أن دورة نمو البصل (120 يومًا) لا تساوي 8 أشهر.
-
-**لقد قمت بإصلاح هذه المشكلات بدقة مع الحفاظ على الكود كما هو تمامًا:**
-
-1.  **إصلاح منطق مقارنة الأشهر:** الآن، لم يعد النظام يعاقبك بشدة إذا اخترت شهر زراعة يقع بعد الشهر المثالي بقليل. بدلاً من ذلك، فهو يحسب الفرق بين الأشهر بطريقة دائرية (مثال: الفرق بين فبراير ومايو هو 3 أشهر فقط، وليس 9 أشهر). هذا يحاكي الواقع حيث يمكنك الزراعة في العام القادم.
-2.  **إصلاح مشكلة التاريخ الفائت:** عندما تختار شهراً فات (مثل مايو) ستحصل على تحذير واضح، لكن النظام سيعامله على أنه فرق زمني مقبول إذا كنت تخطط للعام القادم. التأثير على النتيجة النهائية سيكون بسيطاً جداً.
-3.  **إضافة دورة النمو الصحيحة للبصل:** في بيانات المحصول، دورة نمو البصل هي **120 يومًا** (حوالي 4 أشهر) وليس 8 أشهر. وبالتالي، زراعة البصل في سبتمبر وحصاده في مايو (بعد 8 أشهر) غير منطقية في نظامنا. لقد قمت بتعديل **شهر الحصاد** للبصل في قاعدة البيانات ليكون متوافقاً مع دورة نموه (120 يومًا).
-    - `زراعة: سبتمبر` (الشهر التاسع)
-    - `دورة النمو: 120 يوم` (حوالي 4 أشهر)
-    - `الحصاد: يناير` أو `فبراير` (حسب الصنف، اخترت يناير كشهر حصاد منطقي بعد 4 أشهر).
-
-الآن، عندما تختار ولاية مناسبة للبطاطس أو البصل، ستحصل على توصيات دقيقة وتحذير إذا كان الشهر فائتاً، ولكن دون أن يؤثر ذلك بشكل كبير وغير واقعي على التوصية.
-
-هذا هو الكود الكامل والمعالج:
-
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -839,7 +821,7 @@ select:focus, input:focus {
         <div class="card-icon">📅</div>
         <div class="card-header-text">
           <h2>شهر الزراعة</h2>
-          <p>متى تنوي البدء؟ (يمكنك اختيار شهر مستقبلي للعام القادم)</p>
+          <p>متى تنوي البدء؟</p>
         </div>
       </div>
       <div class="card-body">
@@ -1046,7 +1028,7 @@ const WILAYAS = {
   "المنيعة":{رقم:58,lat:29.7833,lng:2.8833,تربة:"رملية",منطقة:"صحراوية",أمطار:"جافة جداً"},
 };
 
-// CROPS data (مع تعديل شهر الحصاد للبصل ليتوافق مع دورة 120 يوم)
+// CROPS data (simplified for length, but essential fields remain)
 const CROPS = {
   "القمح الصلب":{فئة:"حبوب",إنتاج:2.5,دورة:180,مياه:"منخفضة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الصدأ البني","التفحم"],زراعة:"أكتوبر",حصاد:"يونيو",عائلة:"Poaceae",صعوبة:"سهل",سعر:4500,تصدير:true},
   "القمح اللين":{فئة:"حبوب",إنتاج:3.0,دورة:170,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["الصدأ الأصفر","التفحم"],زراعة:"نوفمبر",حصاد:"يونيو",عائلة:"Poaceae",صعوبة:"سهل",سعر:4000,تصدير:false},
@@ -1054,8 +1036,7 @@ const CROPS = {
   "الذرة الشامية":{فئة:"حبوب",إنتاج:4.5,دورة:140,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["الأنثراكنوز","البياض الدقيقي"],زراعة:"أبريل",حصاد:"سبتمبر",عائلة:"Poaceae",صعوبة:"متوسط",سعر:5000,تصدير:false},
   "الطماطم":{فئة:"خضروات",إنتاج:35.0,دورة:120,مياه:"عالية",تربة:["سوداء","طينية"],أمراض:["الآفة المتأخرة","الذبول"],زراعة:"فبراير",حصاد:"يونيو",عائلة:"Solanaceae",صعوبة:"متوسط",سعر:25000,تصدير:true},
   "البطاطس":{فئة:"خضروات",إنتاج:22.0,دورة:90,مياه:"متوسطة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الآفة المتأخرة","الجرب"],زراعة:"فبراير",حصاد:"مايو",عائلة:"Solanaceae",صعوبة:"متوسط",سعر:15000,تصدير:true},
-  // تعديل البصل: الحصاد بعد 4 أشهر تقريباً من زراعة سبتمبر -> يناير
-  "البصل":{فئة:"خضروات",إنتاج:20.0,دورة:120,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الصدأ"],زراعة:"سبتمبر",حصاد:"يناير",عائلة:"Amaryllidaceae",صعوبة:"سهل",سعر:25000,تصدير:true},
+  "البصل":{فئة:"خضروات",إنتاج:20.0,دورة:120,مياه:"متوسطة",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الصدأ"],زراعة:"سبتمبر",حصاد:"مايو",عائلة:"Amaryllidaceae",صعوبة:"سهل",سعر:25000,تصدير:true},
   "الثوم":{فئة:"خضروات",إنتاج:8.0,دورة:180,مياه:"منخفضة",تربة:["سوداء","طينية"],أمراض:["البياض الدقيقي","الصدأ"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Amaryllidaceae",صعوبة:"سهل",سعر:120000,تصدير:true},
   "الفول":{فئة:"بقوليات",إنتاج:2.5,دورة:180,مياه:"منخفضة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الصدأ","الذبول"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Fabaceae",صعوبة:"سهل",سعر:60000,تصدير:false},
   "الحمص":{فئة:"بقوليات",إنتاج:1.8,دورة:170,مياه:"منخفضة",تربة:["سوداء","طينية","طينية رملية"],أمراض:["الذبول","العفن"],زراعة:"أكتوبر",حصاد:"مايو",عائلة:"Fabaceae",صعوبة:"سهل",سعر:85000,تصدير:true},
@@ -1157,22 +1138,13 @@ function nextStep(from) {
 
 function prevStep(from) { showStep(from-1); }
 
-// حساب الفرق بين شهرين بطريقة دائرية (لأقرب مسافة)
-function getCircularMonthDiff(monthA, monthB) {
-    const idxA = MONTHS_AR.indexOf(monthA);
-    const idxB = MONTHS_AR.indexOf(monthB);
-    if (idxA === -1 || idxB === -1) return 12;
-    const diff = Math.abs(idxA - idxB);
-    return Math.min(diff, 12 - diff);
-}
-
 // Check if month is in the past
 function checkPastMonth(month) {
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const selectedMonthIndex = MONTHS_AR.indexOf(month);
   if(selectedMonthIndex < currentMonth) {
-    return { isPast: true, message: `⚠️ شهر ${month} هو شهر فات (نحن الآن في ${MONTHS_AR[currentMonth]})، يمكنك التخطيط للعام القادم.` };
+    return { isPast: true, message: `⚠️ شهر ${month} هو شهر فات (نحن الآن في ${MONTHS_AR[currentMonth]})، هل تقصد العام القادم؟` };
   }
   return { isPast: false, message: '' };
 }
@@ -1224,7 +1196,7 @@ function checkRotationWithDate(prevCrop, newCrop, prevHarvestDateStr, plantingMo
   return { valid: true, message: `✅ دوران مقبول: ${newCrop} بعد ${prevCrop}${timeMsg}`, type: 'good' };
 }
 
-// Simple rule score (مع تعديل منطق مقارنة الشهر ليستخدم الفرق الدائري)
+// Simple rule score (simplified for length)
 function ruleScore(crop, cropData, wd, st) {
   let score = 0;
   const wmap = {"منخفضة جداً":0,"منخفضة":1,"متوسطة":2,"عالية":3};
@@ -1232,15 +1204,9 @@ function ruleScore(crop, cropData, wd, st) {
   const wdiff = Math.abs(userW - cropW);
   if(wdiff===0) score+=25; else if(wdiff===1) score+=15; else score+=5;
   if((cropData.تربة||[]).includes(wd.تربة)) score+=25; else score+=8;
-  
-  // استخدام الفرق الدائري بين الأشهر بدلاً من الفرق الخطي
-  const monthDiff = getCircularMonthDiff(cropData.زراعة, st.plantMonth);
-  // كلما كان الفرق أصغر كلما كانت الدرجة أفضل (0->20, 1->15, 2->8, >2->2)
-  if(monthDiff === 0) score+=20;
-  else if(monthDiff === 1) score+=15;
-  else if(monthDiff === 2) score+=8;
-  else score+=2;
-  
+  const mi = MONTHS_AR.indexOf(st.plantMonth), ci = MONTHS_AR.indexOf(cropData.زراعة);
+  const diff = Math.min(Math.abs(mi-ci),12-Math.abs(mi-ci));
+  if(diff===0) score+=20; else if(diff<=1) score+=15; else if(diff<=2) score+=8; else score+=2;
   const diffMap={"سهل":0,"متوسط":1,"خبير":2}, expMap={"مبتدئ":0,"متوسط":1,"خبير":2};
   const cd = diffMap[cropData.صعوبة]||0, ue = expMap[st.experience]||0;
   if(ue>=cd) score+=15; else if(ue===cd-1) score+=10; else score+=2;
@@ -1289,7 +1255,7 @@ function buildExplanation(crop, cropData, wd, st, rot, weatherTemp) {
   if(cropData.زراعة === st.plantMonth) {
     items.push({type:'good', text:`شهر ${st.plantMonth} هو الموعد الأمثل للزراعة`});
   } else {
-    items.push({type:'warn', text:`الموعد المثالي هو ${cropData.زراعة} (الفارق ${getCircularMonthDiff(cropData.زراعة, st.plantMonth)} شهر)`});
+    items.push({type:'warn', text:`الموعد المثالي هو ${cropData.زراعة}`});
   }
   if(rot.message) items.push({type: rot.type, text: rot.message});
   if(weatherTemp && weatherTemp > 35) {
@@ -1398,7 +1364,7 @@ function renderResults(top5, weatherTemp) {
         <span class="chevron" id="chev-${idx}">▾</span>
       </div>
       <div class="rec-body ${idx===0?'open':''}" id="body-${idx}">
-        ${rotation.message?`<div class="rot-banner ${rotation.type === 'good' ? 'rot-good' : 'rot-warn'}">${rotation.message}</div>`:''}
+        ${rotation.msg?`<div class="rot-banner ${rotation.type}">${rotation.msg}</div>`:''}
         <div class="stats-grid">
           <div class="stat-tile"><div class="stat-val">${expYield.toFixed(1)} طن</div><div class="stat-label">الإنتاج المتوقع</div></div>
           <div class="stat-tile"><div class="stat-val">${cropData.إنتاج} طن/هـ</div><div class="stat-label">الإنتاجية</div></div>
@@ -1588,4 +1554,3 @@ init();
 </script>
 </body>
 </html>
-```
