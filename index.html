@@ -1908,6 +1908,159 @@ function resetForm() {
 }
 
 init();
+
+<!-- ... كل الكود السابق ... -->
+
+// ════════════════════════════════════════════════════════════
+// FLUTTER COMMUNICATION - أضف هذا في النهاية
+// ════════════════════════════════════════════════════════════
+
+/**
+ * إرسال بيانات المحصول إلى تطبيق Flutter
+ * @param {string} cropName - اسم المحصول
+ * @param {string} category - فئة المحصول
+ * @param {string} score - نسبة التوصية
+ * @param {string} yieldInfo - معلومات الإنتاج
+ */
+function notifyFlutterCropSelection(cropName, category, score, yieldInfo) {
+  if (window.CropSelected) {
+    window.CropSelected.postMessage(JSON.stringify({
+      name: cropName?.trim() || 'غير محدد',
+      category: category?.trim() || 'غير محدد',
+      score: score?.trim() || '0%',
+      yield: yieldInfo?.trim() || ''
+    }));
+  }
+}
+
+/**
+ * إضافة أزرار "حفظ" على كل كارد توصية
+ */
+function addSaveButtons() {
+  const cards = document.querySelectorAll('.rec-card');
+  
+  cards.forEach((card, index) => {
+    // منع إضافة الزر أكثر من مرة
+    if (card.dataset.flutterSaveBtn) return;
+    card.dataset.flutterSaveBtn = 'true';
+    
+    // استخراج البيانات من الكارد
+    const cropName = card.querySelector('.rec-name')?.textContent?.trim();
+    const category = card.querySelector('.cat-pill')?.textContent?.trim();
+    const score = card.querySelector('.score-num')?.textContent?.trim();
+    const yieldInfo = card.querySelectorAll('.sv')[0]?.textContent?.trim();
+    
+    // إنشاء زر الحفظ
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save-crop-btn';
+    saveBtn.innerHTML = '💾 حفظ';
+    saveBtn.setAttribute('aria-label', 'حفظ هذا المحصول في التطبيق');
+    saveBtn.style.cssText = `
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #55833D;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(85,131,61,0.3);
+      transition: all 0.2s ease;
+    `;
+    
+    // تأثيرات الهوفر
+    saveBtn.onmouseenter = () => {
+      saveBtn.style.background = '#4a7234';
+      saveBtn.style.transform = 'translateY(-1px)';
+    };
+    saveBtn.onmouseleave = () => {
+      saveBtn.style.background = '#55833D';
+      saveBtn.style.transform = 'translateY(0)';
+    };
+    
+    // عند النقر على الزر
+    saveBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      notifyFlutterCropSelection(cropName, category, score, yieldInfo);
+    };
+    
+    // إضافة الزر إلى الهيدر
+    const head = card.querySelector('.rec-head');
+    if (head) {
+      head.style.position = 'relative';
+      head.appendChild(saveBtn);
+    }
+    
+    // جعل الكارد كله قابل للنقر (اختياري)
+    card.addEventListener('click', function(e) {
+      // تجاهل النقرات على الأزرار الأخرى
+      if (e.target.closest('.save-crop-btn, .btn, button, a, input, select')) return;
+      
+      notifyFlutterCropSelection(cropName, category, score, yieldInfo);
+    });
+  });
+}
+
+/**
+ * مراقبة ظهور التوصيات وإضافة الأزرار تلقائياً
+ */
+function setupFlutterIntegration() {
+  // محاولة فورية
+  addSaveButtons();
+  
+  // محاولة بعد 2 ثانية (عند ظهور النتائج)
+  setTimeout(addSaveButtons, 2000);
+  
+  // محاولة بعد 4 ثانية (للتأكد)
+  setTimeout(addSaveButtons, 4000);
+  
+  // مراقبة التغيرات في الصفحة (MutationObserver)
+  if (window.MutationObserver) {
+    const observer = new MutationObserver((mutations) => {
+      let shouldRun = false;
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0) {
+          shouldRun = true;
+        }
+      });
+      if (shouldRun) addSaveButtons();
+    });
+    
+    observer.observe(document.getElementById('resultsList') || document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+}
+
+// تشغيل التكامل عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', setupFlutterIntegration);
+
+// أيضاً عند النقر على زر "احسب التوصيات"
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('button');
+  if (btn && (btn.textContent.includes('احسب') || btn.textContent.includes('توصيات'))) {
+    setTimeout(setupFlutterIntegration, 3000);
+  }
+});
+
+// إشعار Flutter أن الصفحة جاهزة (اختياري)
+if (window.PageLoaded) {
+  setTimeout(() => {
+    PageLoaded.postMessage('agri-recommend-ready');
+  }, 1000);
+}
+
+init();
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
