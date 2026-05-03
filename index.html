@@ -1894,6 +1894,8 @@ function toggleCard(header) {
   if(chev) chev.classList.toggle('open', !isOpen);
 }
 
+// ... كل الدوال السابقة ...
+
 function resetForm() {
   document.getElementById('resultsDiv').classList.add('hidden');
   document.getElementById('wilayaSelect').value='';
@@ -1907,21 +1909,10 @@ function resetForm() {
   showStep(1);
 }
 
-init();
-
-<!-- ... كل الكود السابق ... -->
-
 // ════════════════════════════════════════════════════════════
-// FLUTTER COMMUNICATION - أضف هذا في النهاية
+// FLUTTER COMMUNICATION
 // ════════════════════════════════════════════════════════════
 
-/**
- * إرسال بيانات المحصول إلى تطبيق Flutter
- * @param {string} cropName - اسم المحصول
- * @param {string} category - فئة المحصول
- * @param {string} score - نسبة التوصية
- * @param {string} yieldInfo - معلومات الإنتاج
- */
 function notifyFlutterCropSelection(cropName, category, score, yieldInfo) {
   if (window.CropSelected) {
     window.CropSelected.postMessage(JSON.stringify({
@@ -1933,24 +1924,18 @@ function notifyFlutterCropSelection(cropName, category, score, yieldInfo) {
   }
 }
 
-/**
- * إضافة أزرار "حفظ" على كل كارد توصية
- */
 function addSaveButtons() {
   const cards = document.querySelectorAll('.rec-card');
   
   cards.forEach((card, index) => {
-    // منع إضافة الزر أكثر من مرة
     if (card.dataset.flutterSaveBtn) return;
     card.dataset.flutterSaveBtn = 'true';
     
-    // استخراج البيانات من الكارد
     const cropName = card.querySelector('.rec-name')?.textContent?.trim();
     const category = card.querySelector('.cat-pill')?.textContent?.trim();
     const score = card.querySelector('.score-num')?.textContent?.trim();
     const yieldInfo = card.querySelectorAll('.sv')[0]?.textContent?.trim();
     
-    // إنشاء زر الحفظ
     const saveBtn = document.createElement('button');
     saveBtn.className = 'save-crop-btn';
     saveBtn.innerHTML = '💾 حفظ';
@@ -1973,7 +1958,6 @@ function addSaveButtons() {
       transition: all 0.2s ease;
     `;
     
-    // تأثيرات الهوفر
     saveBtn.onmouseenter = () => {
       saveBtn.style.background = '#4a7234';
       saveBtn.style.transform = 'translateY(-1px)';
@@ -1983,44 +1967,30 @@ function addSaveButtons() {
       saveBtn.style.transform = 'translateY(0)';
     };
     
-    // عند النقر على الزر
     saveBtn.onclick = (e) => {
       e.preventDefault();
       e.stopPropagation();
       notifyFlutterCropSelection(cropName, category, score, yieldInfo);
     };
     
-    // إضافة الزر إلى الهيدر
     const head = card.querySelector('.rec-head');
     if (head) {
       head.style.position = 'relative';
       head.appendChild(saveBtn);
     }
     
-    // جعل الكارد كله قابل للنقر (اختياري)
     card.addEventListener('click', function(e) {
-      // تجاهل النقرات على الأزرار الأخرى
       if (e.target.closest('.save-crop-btn, .btn, button, a, input, select')) return;
-      
       notifyFlutterCropSelection(cropName, category, score, yieldInfo);
     });
   });
 }
 
-/**
- * مراقبة ظهور التوصيات وإضافة الأزرار تلقائياً
- */
 function setupFlutterIntegration() {
-  // محاولة فورية
   addSaveButtons();
-  
-  // محاولة بعد 2 ثانية (عند ظهور النتائج)
   setTimeout(addSaveButtons, 2000);
-  
-  // محاولة بعد 4 ثانية (للتأكد)
   setTimeout(addSaveButtons, 4000);
   
-  // مراقبة التغيرات في الصفحة (MutationObserver)
   if (window.MutationObserver) {
     const observer = new MutationObserver((mutations) => {
       let shouldRun = false;
@@ -2039,10 +2009,8 @@ function setupFlutterIntegration() {
   }
 }
 
-// تشغيل التكامل عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', setupFlutterIntegration);
 
-// أيضاً عند النقر على زر "احسب التوصيات"
 document.addEventListener('click', function(e) {
   const btn = e.target.closest('button');
   if (btn && (btn.textContent.includes('احسب') || btn.textContent.includes('توصيات'))) {
@@ -2050,17 +2018,16 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// إشعار Flutter أن الصفحة جاهزة (اختياري)
 if (window.PageLoaded) {
   setTimeout(() => {
     PageLoaded.postMessage('agri-recommend-ready');
   }, 1000);
 }
 
+// ════════════════════════════════════════════════════════════
+// INIT - مرة واحدة فقط في النهاية!
+// ════════════════════════════════════════════════════════════
 init();
-</script>
-</body>
-</html>
 </script>
 </body>
 </html>
