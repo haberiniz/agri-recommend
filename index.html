@@ -418,11 +418,11 @@ select:focus, input[type=number]:focus {
 }
 .btn-accent:hover { box-shadow: 0 5px 18px rgba(82,65,51,.42); }
 
-/* ═══════════════════════════════════════════════ LOADING */
+/* ═══════════════════════════════════════════════ LOADING - NEW VISUAL DESIGN */
 .loading-wrap {
   background: var(--bg-card);
   border-radius: var(--r-lg);
-  padding: 60px 24px;
+  padding: 60px 30px 50px;
   text-align: center;
   box-shadow: var(--sh-md);
   display: none;
@@ -431,56 +431,122 @@ select:focus, input[type=number]:focus {
   position: relative;
   overflow: hidden;
 }
-.loading-wrap.show { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.loading-wrap.show { display: block; }
 
-/* Visual Loader Components */
-.loader-container {
+/* Tractor Container */
+.tractor-loader {
+  position: relative;
+  width: 140px;
+  height: 100px;
+  margin: 0 auto 35px;
+  animation: tractorBounce 2s ease-in-out infinite;
+}
+
+@keyframes tractorBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-8px) scale(1.02); }
+  50% { transform: translateY(0) scale(1); }
+  75% { transform: translateY(-4px) scale(1.01); }
+}
+
+/* Tractor SVG Styling */
+.tractor-svg {
   width: 100%;
-  max-width: 280px;
-  position: relative;
-  margin-bottom: 24px;
+  height: 100%;
+  filter: drop-shadow(0 4px 8px rgba(85,131,61,0.25));
 }
 
-.tractor-wrapper {
-  font-size: 48px;
-  margin-bottom: 8px;
-  display: inline-block;
-  animation: tractorDrive 2.5s ease-in-out infinite;
-  position: relative;
-  z-index: 2;
+.tractor-body { fill: var(--primary); }
+.tractor-cabin { fill: var(--primary-lt); }
+.tractor-wheel-big { fill: var(--text-dark); }
+.tractor-wheel-small { fill: var(--text-dark); }
+.tractor-wheel-center { fill: var(--accent); }
+.tractor-exhaust { fill: var(--primary-dark); }
+.tractor-window { fill: var(--bg-soft); opacity: 0.7; }
+
+/* Wheel rotation animation */
+.wheel-rotate {
+  animation: wheelSpin 2s linear infinite;
+  transform-origin: center;
 }
 
-@keyframes tractorDrive {
-  0% { transform: translateX(110px) rotate(0deg); }
-  45% { transform: translateX(-110px) rotate(0deg); }
-  50% { transform: translateX(-110px) rotateY(180deg); }
-  95% { transform: translateX(110px) rotateY(180deg); }
-  100% { transform: translateX(110px) rotateY(0deg); }
+@keyframes wheelSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
+/* Progress Bar */
 .progress-container {
   width: 100%;
-  height: 10px;
+  max-width: 280px;
+  margin: 0 auto 20px;
   background: var(--bg-soft);
   border-radius: 20px;
+  height: 8px;
   overflow: hidden;
-  border: 1px solid var(--border);
   position: relative;
 }
 
-.progress-bar-fill {
+.progress-bar {
   height: 100%;
-  background: var(--primary);
-  width: 0%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-lt) 100%);
   border-radius: 20px;
+  width: 0%;
+  animation: progressFill 2s ease-in-out infinite;
   transition: width 0.3s ease;
 }
 
+@keyframes progressFill {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+
+/* Loading Text */
 .loading-text {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-dark);
-  margin-top: 12px;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.loading-subtext {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* Dust particles animation */
+.dust-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--bg-soft);
+  border-radius: 50%;
+  opacity: 0;
+  animation: dustFloat 2s ease-out infinite;
+}
+
+.dust-particle:nth-child(1) { left: 20%; bottom: 10%; animation-delay: 0s; }
+.dust-particle:nth-child(2) { left: 40%; bottom: 5%; animation-delay: 0.5s; }
+.dust-particle:nth-child(3) { left: 60%; bottom: 8%; animation-delay: 1s; }
+.dust-particle:nth-child(4) { left: 80%; bottom: 12%; animation-delay: 1.5s; }
+
+@keyframes dustFloat {
+  0% { 
+    opacity: 0; 
+    transform: translateY(0) scale(0.5); 
+  }
+  50% { 
+    opacity: 0.6; 
+    transform: translateY(-20px) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-40px) scale(0.5); 
+  }
 }
 
 /* ═══════════════════════════════════════════════ RESULTS */
@@ -697,7 +763,7 @@ select:focus, input[type=number]:focus {
 .rot-banner {
   padding: 10px 12px;
   border-radius: var(--r-sm);
-  font-size: 12px; font-weight: 700;
+  font-size: 12px font-weight: 700;
   margin-bottom: 10px;
   display: flex; align-items: flex-start; gap: 8px;
   line-height: 1.5;
@@ -923,7 +989,7 @@ select:focus, input[type=number]:focus {
     <!-- ── STEP 8: EXPERIENCE ── -->
     <div class="step-card hidden" id="step8">
       <div class="card-top">
-        <div class="card-icon">👨‍🌾</div>
+        <div class="card-icon">👨‍</div>
         <div class="card-hd"><h2>مستوى الخبرة</h2><p>كم سنة في الزراعة؟</p></div>
       </div>
       <div class="card-body">
@@ -942,15 +1008,66 @@ select:focus, input[type=number]:focus {
       </div>
     </div>
 
-    <!-- ── LOADING ── -->
+    <!-- ── LOADING - NEW VISUAL DESIGN ── -->
     <div class="loading-wrap" id="loadingDiv">
-      <div class="loader-container">
-        <div class="tractor-wrapper">🚜</div>
-        <div class="progress-container">
-          <div class="progress-bar-fill" id="loadingProgress"></div>
-        </div>
+      <!-- Tractor Animation -->
+      <div class="tractor-loader">
+        <svg class="tractor-svg" viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Big rear wheel -->
+          <g class="wheel-rotate" style="transform-origin: 35px 70px;">
+            <circle cx="35" cy="70" r="25" class="tractor-wheel-big"/>
+            <circle cx="35" cy="70" r="10" class="tractor-wheel-center"/>
+            <!-- Wheel treads -->
+            <path d="M35 45 L35 50 M35 90 L35 95 M10 70 L15 70 M55 70 L60 70 M18 53 L21 57 M49 83 L52 87 M18 87 L21 83 M49 53 L52 57" 
+                  stroke="#E3EED4" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          
+          <!-- Small front wheel -->
+          <g class="wheel-rotate" style="transform-origin: 105px 70px;">
+            <circle cx="105" cy="70" r="16" class="tractor-wheel-small"/>
+            <circle cx="105" cy="70" r="6" class="tractor-wheel-center"/>
+            <!-- Wheel treads -->
+            <path d="M105 54 L105 58 M105 82 L105 86 M89 70 L93 70 M117 70 L121 70 M94 59 L97 62 M113 78 L116 81 M94 81 L97 78 M113 62 L116 59" 
+                  stroke="#E3EED4" stroke-width="2.5" stroke-linecap="round"/>
+          </g>
+          
+          <!-- Tractor body -->
+          <path d="M55 70 L55 55 Q55 45 65 45 L95 45 Q110 45 110 60 L110 70 Z" class="tractor-body"/>
+          
+          <!-- Cabin -->
+          <path d="M58 45 L58 25 Q58 18 68 18 L88 18 Q95 18 95 25 L95 45 Z" class="tractor-cabin"/>
+          
+          <!-- Window -->
+          <rect x="62" y="22" width="28" height="18" rx="2" class="tractor-window"/>
+          
+          <!-- Exhaust pipe -->
+          <rect x="98" y="30" width="5" height="15" class="tractor-exhaust"/>
+          <path d="M98 30 Q98 25 103 25" stroke="#524133" stroke-width="5" fill="none" stroke-linecap="round"/>
+          
+          <!-- Front grill details -->
+          <line x1="100" y1="52" x2="108" y2="52" stroke="#E3EED4" stroke-width="2" opacity="0.6"/>
+          <line x1="100" y1="57" x2="108" y2="57" stroke="#E3EED4" stroke-width="2" opacity="0.6"/>
+          <line x1="100" y1="62" x2="108" y2="62" stroke="#E3EED4" stroke-width="2" opacity="0.6"/>
+          
+          <!-- Headlight -->
+          <circle cx="108" cy="48" r="3" fill="#DDA811"/>
+          
+          <!-- Dust particles -->
+          <circle class="dust-particle" cx="20" cy="90" r="3"/>
+          <circle class="dust-particle" cx="40" cy="95" r="2"/>
+          <circle class="dust-particle" cx="60" cy="92" r="3"/>
+          <circle class="dust-particle" cx="80" cy="88" r="2"/>
+        </svg>
       </div>
-      <div class="loading-text">جاري تحميل بياناتك...</div>
+      
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-bar" id="loadingProgress"></div>
+      </div>
+      
+      <!-- Text -->
+      <p class="loading-text">جاري تحميل بياناتك...</p>
+      <p class="loading-subtext">نظام التوصيات الزراعية الذكي</p>
     </div>
 
     <!-- ── RESULTS ── -->
@@ -1224,26 +1341,11 @@ const state = { wilaya:'', area:0, plantMonthIdx:-1, prevCrop:'', category:'', w
 // ════════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════════
-async function init() {
+function init() {
   buildStepper();
   populateSelects();
   buildMonthGrid();
   showTodayBanner();
-  
-  // Initial Loading Experience
-  const ld = document.getElementById('loadingDiv');
-  const prog = document.getElementById('loadingProgress');
-  ld.classList.add('show');
-  
-  // Simulate initial data loading
-  prog.style.width = '30%';
-  await sleep(600);
-  prog.style.width = '65%';
-  await sleep(800);
-  prog.style.width = '100%';
-  await sleep(400);
-  
-  ld.classList.remove('show');
   showStep(1);
 }
 
@@ -1571,10 +1673,14 @@ async function generateRecommendations() {
   ld.classList.add('show');
   updateStepper(9);
 
-  const prog = document.getElementById('loadingProgress');
-  prog.style.width = '20%';
-  await sleep(400);
-  prog.style.width = '40%';
+  // Animate progress bar
+  const progressBar = document.getElementById('loadingProgress');
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress += Math.random() * 15;
+    if(progress > 90) progress = 90;
+    progressBar.style.width = progress + '%';
+  }, 300);
 
   // Fetch weather
   let wTemp = null;
@@ -1584,10 +1690,8 @@ async function generateRecommendations() {
     if(r.ok){ const d=await r.json(); wTemp=d.current?.temperature_2m; }
   } catch(e){}
 
-  prog.style.width = '70%';
-  await sleep(400);
-  prog.style.width = '100%';
-  await sleep(300);
+  clearInterval(progressInterval);
+  progressBar.style.width = '100%';
 
   const wd = WILAYAS[state.wilaya];
   const scored = [];
@@ -1806,4 +1910,4 @@ function resetForm() {
 init();
 </script>
 </body>
-</html>   حبيت اديك في النتيجة كي يقعد يدورشوي باه تخرج النتيجة ولا في لول في تحميل بيانات نظام التوصيات بدا ماتدور وهدرة وكدا حبيت تجي الشاحنة وهي كي شغل تمشي مخع خط التعبئة من تحت فقط
+</html>
