@@ -1893,7 +1893,6 @@ function toggleCard(header) {
   const chev = document.getElementById(`chev-${idx}`);
   if(chev) chev.classList.toggle('open', !isOpen);
 }
-
 // ... كل الدوال السابقة ...
 
 function resetForm() {
@@ -1914,75 +1913,85 @@ function resetForm() {
 // ════════════════════════════════════════════════════════════
 
 function notifyFlutterCropSelection(cropName, category, score, yieldInfo) {
+  console.log('🚀 notifyFlutterCropSelection:', { cropName, category, score, yieldInfo });
+  
   if (window.CropSelected) {
-    window.CropSelected.postMessage(JSON.stringify({
+    const payload = JSON.stringify({
       name: cropName?.trim() || 'غير محدد',
       category: category?.trim() || 'غير محدد',
       score: score?.trim() || '0%',
-      yield: yieldInfo?.trim() || ''
-    }));
+      yield: yieldInfo?.trim() || '',
+      timestamp: new Date().toISOString()
+    });
+    console.log('📦 Payload:', payload);
+    window.CropSelected.postMessage(payload);
+  } else {
+    console.warn('⚠️ CropSelected channel NOT FOUND!');
   }
 }
 
 function addSaveButtons() {
   const cards = document.querySelectorAll('.rec-card');
   
-  cards.forEach((card, index) => {
+  cards.forEach((card) => {
     if (card.dataset.flutterSaveBtn) return;
     card.dataset.flutterSaveBtn = 'true';
     
-    const cropName = card.querySelector('.rec-name')?.textContent?.trim();
-    const category = card.querySelector('.cat-pill')?.textContent?.trim();
-    const score = card.querySelector('.score-num')?.textContent?.trim();
-    const yieldInfo = card.querySelectorAll('.sv')[0]?.textContent?.trim();
+    const recHead = card.querySelector('.rec-head');
+    if (!recHead) return;
+    
+    const cropName = recHead.querySelector('.rec-name')?.textContent?.trim() || 'غير محدد';
+    const category = recHead.querySelector('.cat-pill')?.textContent?.trim() || 'غير محدد';
+    const score = recHead.querySelector('.score-num')?.textContent?.trim() || '0%';
+    
+    let yieldInfo = '';
+    const yieldEls = card.querySelectorAll('.sv, .yield');
+    if (yieldEls.length > 0) yieldInfo = yieldEls[0].textContent?.trim() || '';
+    
+    console.log('🔍 Crop Data:', { cropName, category, score, yieldInfo });
     
     const saveBtn = document.createElement('button');
     saveBtn.className = 'save-crop-btn';
-    saveBtn.innerHTML = '💾 حفظ';
-    saveBtn.setAttribute('aria-label', 'حفظ هذا المحصول في التطبيق');
+    saveBtn.innerHTML = '💾';
+    saveBtn.title = 'حفظ في التطبيق';
+    
     saveBtn.style.cssText = `
       position: absolute;
-      top: 12px;
+      bottom: 8px;
       left: 12px;
       background: #55833D;
       color: white;
       border: none;
-      padding: 8px 16px;
-      border-radius: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
       cursor: pointer;
-      font-family: 'Cairo', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       z-index: 100;
-      box-shadow: 0 2px 8px rgba(85,131,61,0.3);
-      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(85,131,61,0.25);
+      transition: all 0.15s ease;
+      padding: 0;
     `;
     
-    saveBtn.onmouseenter = () => {
-      saveBtn.style.background = '#4a7234';
-      saveBtn.style.transform = 'translateY(-1px)';
-    };
-    saveBtn.onmouseleave = () => {
-      saveBtn.style.background = '#55833D';
-      saveBtn.style.transform = 'translateY(0)';
-    };
+    saveBtn.onmouseenter = () => { saveBtn.style.background = '#4a7234'; saveBtn.style.transform = 'scale(1.1)'; };
+    saveBtn.onmouseleave = () => { saveBtn.style.background = '#55833D'; saveBtn.style.transform = 'scale(1)'; };
     
     saveBtn.onclick = (e) => {
       e.preventDefault();
       e.stopPropagation();
+      saveBtn.style.background = '#3d5c2e';
+      saveBtn.innerHTML = '✓';
+      
       notifyFlutterCropSelection(cropName, category, score, yieldInfo);
+      
+      setTimeout(() => { saveBtn.innerHTML = '💾'; saveBtn.style.background = '#55833D'; }, 1000);
     };
     
-    const head = card.querySelector('.rec-head');
-    if (head) {
-      head.style.position = 'relative';
-      head.appendChild(saveBtn);
-    }
-    
-    card.addEventListener('click', function(e) {
-      if (e.target.closest('.save-crop-btn, .btn, button, a, input, select')) return;
-      notifyFlutterCropSelection(cropName, category, score, yieldInfo);
-    });
+    recHead.style.position = 'relative';
+    recHead.appendChild(saveBtn);
   });
 }
 
@@ -1994,34 +2003,33 @@ function setupFlutterIntegration() {
   if (window.MutationObserver) {
     const observer = new MutationObserver((mutations) => {
       let shouldRun = false;
-      mutations.forEach((mutation) => {
-        if (mutation.addedNodes.length > 0) {
-          shouldRun = true;
-        }
-      });
+      mutations.forEach((m) => { if (m.addedNodes.length > 0) shouldRun = true; });
       if (shouldRun) addSaveButtons();
     });
-    
-    observer.observe(document.getElementById('resultsList') || document.body, {
-      childList: true,
-      subtree: true
-    });
+    observer.observe(document.getElementById('resultsList') || document.body, { childList: true, subtree: true });
   }
 }
 
-document.addEventListener('DOMContentLoaded', setupFlutterIntegration);
+// ════════════════════════════════════════════════════════════
+// EVENT LISTENERS
+// ════════════════════════════════════════════════════════════
 
-document.addEventListener('click', function(e) {
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('📄 DOM loaded');
+  setupFlutterIntegration();
+});
+
+document.addEventListener('click', (e) => {
   const btn = e.target.closest('button');
   if (btn && (btn.textContent.includes('احسب') || btn.textContent.includes('توصيات'))) {
+    console.log('🔘 Calculate button clicked');
     setTimeout(setupFlutterIntegration, 3000);
   }
 });
 
+// Notify Flutter that page is ready (optional)
 if (window.PageLoaded) {
-  setTimeout(() => {
-    PageLoaded.postMessage('agri-recommend-ready');
-  }, 1000);
+  setTimeout(() => PageLoaded.postMessage('agri-recommend-ready'), 1000);
 }
 
 // ════════════════════════════════════════════════════════════
