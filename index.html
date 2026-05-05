@@ -418,20 +418,79 @@ select:focus, input[type=number]:focus {
 }
 .btn-accent:hover { box-shadow: 0 5px 18px rgba(82,65,51,.42); }
 
-/* ═══════════════════════════════════════════════ LOADING - NEW VISUAL DESIGN */
-.loading-wrap {
-  background: var(--bg-card);
-  border-radius: var(--r-lg);
-  padding: 60px 30px 50px;
-  text-align: center;
-  box-shadow: var(--sh-md);
-  display: none;
-  border: 1px solid var(--border);
+/* ═══════════════════════════════════════════════ LOADING STAGES */
+.loading-page-full {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 40px 24px;
+  background: var(--bg-page);
   animation: slideUp .3s ease;
-  position: relative;
-  overflow: hidden;
 }
-.loading-wrap.show { display: block; }
+.loading-page-full.hidden { display: none !important; }
+.lp-circle-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+.lp-ring-svg {
+  width: 120px;
+  height: 120px;
+}
+.lp-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--primary);
+}
+.lp-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+  text-align: center;
+}
+.lp-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 280px;
+  margin-top: 8px;
+}
+.lp-stage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: color .3s;
+}
+.lp-stage.done    { color: var(--text-dark); }
+.lp-stage.active-s { color: var(--primary); font-weight: 700; }
+.lst-icon {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all .3s;
+}
+.lst-icon.pending  { background: var(--bg-soft); border: 2px solid var(--border); }
+.lst-icon.in-prog  { background: #FFF8E1; border: 2px solid var(--gold-lt); }
+.lst-icon.in-prog::after { content:''; width:10px;height:10px;border-radius:50%;background:var(--gold-lt);display:block; animation:pulse-dot 1s infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+.lst-icon.done     { background: var(--primary); border-color: var(--primary); color:white; }
+.lst-icon.done::after { content: '✓'; font-size: 12px; font-weight:900; }
 
 /* Tractor Container */
 .tractor-loader {
@@ -1015,176 +1074,26 @@ select:focus, input[type=number]:focus {
     </div>
 
     <!-- ── LOADING - NEW VISUAL DESIGN ── -->
-   <div class="loading-wrap" id="loadingDiv">
-  <style>
-    .loading-wrap {
-      width: 100%;
-      min-height: 100vh;
-      background: linear-gradient(160deg, #edf0e8 0%, #e2e8d8 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 28px;
-      padding: 60px 40px;
-      position: relative;
-      overflow: hidden;
-    }
-    .bg-circle1 {
-      position: absolute;
-      width: 300px; height: 300px;
-      border-radius: 50%;
-      background: rgba(85,131,61,0.06);
-      top: -80px; right: -80px;
-    }
-    .bg-circle2 {
-      position: absolute;
-      width: 200px; height: 200px;
-      border-radius: 50%;
-      background: rgba(85,131,61,0.05);
-      bottom: -60px; left: -60px;
-    }
-    .tractor-wrap {
-      position: relative;
-      animation: float 3s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%,100% { transform: translateY(0px); }
-      50%      { transform: translateY(-8px); }
-    }
-    .tractor-svg { width: 160px; filter: drop-shadow(0 8px 16px rgba(85,131,61,0.18)); }
-    .shadow {
-      width: 120px; height: 10px;
-      background: rgba(85,131,61,0.15);
-      border-radius: 50%;
-      margin: -4px auto 0;
-      animation: shadow-pulse 3s ease-in-out infinite;
-    }
-    @keyframes shadow-pulse {
-      0%,100% { transform: scaleX(1);    opacity: 0.5; }
-      50%      { transform: scaleX(0.75); opacity: 0.25; }
-    }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .rear-wheel  { animation: spin 1.2s linear infinite; transform-origin: 35px 70px; }
-    .front-wheel { animation: spin 1.2s linear infinite; transform-origin: 105px 70px; }
-    @keyframes puff {
-      0%   { opacity: 0.6; transform: translate(0,0)     scale(1);   }
-      100% { opacity: 0;   transform: translate(-12px,-18px) scale(1.8); }
-    }
-    .smoke1 { animation: puff 1.4s ease-out infinite; }
-    .smoke2 { animation: puff 1.4s ease-out 0.5s infinite; }
-    .progress-wrap {
-      width: 200px;
-      background: rgba(85,131,61,0.15);
-      border-radius: 100px;
-      height: 6px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%;
-      border-radius: 100px;
-      background: #55833D;
-      animation: progress 3s ease-in-out infinite;
-    }
-    @keyframes progress {
-      0%   { width: 0%; }
-      60%  { width: 80%; }
-      80%  { width: 88%; }
-      100% { width: 95%; }
-    }
-    .label-main {
-      font-family: serif;
-      font-size: 22px;
-      font-weight: 600;
-      color: #3E2F24;
-      letter-spacing: 0.02em;
-    }
-    .label-sub {
-      font-size: 13px;
-      color: #55833D;
-      letter-spacing: 0.04em;
-      opacity: 0.85;
-      font-family: sans-serif;
-    }
-    .dots span { animation: blink 1.2s infinite; }
-    .dots span:nth-child(2) { animation-delay: 0.2s; }
-    .dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes blink {
-      0%,100% { opacity: 0.2; }
-      50%      { opacity: 1; }
-    }
-  </style>
-
-  <div class="bg-circle1"></div>
-  <div class="bg-circle2"></div>
-
-  <div class="tractor-wrap">
-    <svg class="tractor-svg" viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg">
-
-      <!-- Smoke -->
-      <g class="smoke1"><circle cx="102" cy="22" r="5" fill="#b8c9a8" opacity="0.5"/></g>
-      <g class="smoke2"><circle cx="98"  cy="18" r="3.5" fill="#c5d4b0" opacity="0.4"/></g>
-
-      <!-- Rear wheel -->
-      <g class="rear-wheel">
-        <circle cx="35" cy="70" r="25" fill="#3a3a3a"/>
-        <circle cx="35" cy="70" r="20" fill="#2d2d2d"/>
-        <circle cx="35" cy="70" r="10" fill="#e8e4dc"/>
-        <circle cx="35" cy="70" r="5"  fill="#55833D"/>
-        <line x1="35" y1="45" x2="35" y2="95" stroke="#444" stroke-width="2.5"/>
-        <line x1="10" y1="70" x2="60" y2="70" stroke="#444" stroke-width="2.5"/>
-        <line x1="18" y1="52" x2="52" y2="88" stroke="#444" stroke-width="2"/>
-        <line x1="52" y1="52" x2="18" y2="88" stroke="#444" stroke-width="2"/>
-      </g>
-
-      <!-- Front wheel -->
-      <g class="front-wheel">
-        <circle cx="105" cy="70" r="16" fill="#3a3a3a"/>
-        <circle cx="105" cy="70" r="12" fill="#2d2d2d"/>
-        <circle cx="105" cy="70" r="6"  fill="#e8e4dc"/>
-        <circle cx="105" cy="70" r="3"  fill="#55833D"/>
-        <line x1="105" y1="54" x2="105" y2="86" stroke="#444" stroke-width="2"/>
-        <line x1="89"  y1="70" x2="121" y2="70" stroke="#444" stroke-width="2"/>
-      </g>
-
-      <!-- Body -->
-      <path d="M55 70 L55 52 Q55 44 63 44 L95 44 Q112 44 112 60 L112 70 Z" fill="#55833D"/>
-      <!-- Cabin -->
-      <path d="M57 44 L57 24 Q57 16 67 16 L88 16 Q96 16 96 24 L96 44 Z" fill="#4a7535"/>
-      <!-- Window -->
-      <rect x="61" y="20" width="30" height="20" rx="3" fill="#c8dff0" opacity="0.85"/>
-      <rect x="63" y="22" width="12" height="16" rx="2" fill="#a8cbea" opacity="0.7"/>
-      <!-- Exhaust -->
-      <rect x="97" y="28" width="4" height="16" rx="2" fill="#524133"/>
-      <rect x="97" y="25" width="6" height="5"  rx="3" fill="#524133"/>
-      <!-- Grill -->
-      <rect x="100" y="50" width="10" height="18" rx="2" fill="#3d6b2b"/>
-      <line x1="101" y1="54" x2="109" y2="54" stroke="#E3EED4" stroke-width="1.5" opacity="0.7"/>
-      <line x1="101" y1="58" x2="109" y2="58" stroke="#E3EED4" stroke-width="1.5" opacity="0.7"/>
-      <line x1="101" y1="62" x2="109" y2="62" stroke="#E3EED4" stroke-width="1.5" opacity="0.7"/>
-      <!-- Headlight -->
-      <circle cx="110" cy="47" r="3.5" fill="#DDA811"/>
-      <circle cx="110" cy="47" r="1.5" fill="#fff" opacity="0.5"/>
-      <!-- Ground line -->
-      <path d="M58 68 Q46 75 22 75" stroke="#3d6b2b" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>
-    </svg>
-    <div class="shadow"></div>
-  </div>
-
-  <!-- Progress bar -->
-  <div class="progress-wrap">
-    <div class="progress-bar" id="loadingProgress"></div>
-  </div>
-
-  <!-- Text -->
-  <div style="text-align:center; display:flex; flex-direction:column; gap:6px;">
-    <p class="label-sub">
-      جاري تحميل بياناتك
-      <span class="dots"><span>.</span><span>.</span><span>.</span></span>
-    </p>
-  </div>
-</div>
-
+   <!-- ── LOADING - STAGES DESIGN ── -->
+    <div class="loading-page-full hidden" id="loadingDiv">
+      <div class="lp-circle-wrap">
+        <svg class="lp-ring-svg" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="6"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--primary)" stroke-width="6"
+            stroke-dasharray="314" stroke-dashoffset="314"
+            stroke-linecap="round"
+            id="lp-ring" style="transition:stroke-dashoffset 0.5s ease;transform:rotate(-90deg);transform-origin:50% 50%;"/>
+        </svg>
+        <div class="lp-pct" id="lpPct">0%</div>
+      </div>
+      <p class="lp-title">جاري تحميل نظام التوصيات...</p>
+      <div class="lp-stages" id="lpStages">
+        <div class="lp-stage" id="lst0"><span class="lst-icon pending"></span><span class="lst-txt">جلب بيانات الطقس</span></div>
+        <div class="lp-stage" id="lst1"><span class="lst-icon pending"></span><span class="lst-txt">تحليل التربة والموسم</span></div>
+        <div class="lp-stage" id="lst2"><span class="lst-icon pending active-stage"></span><span class="lst-txt">تطبيق نموذج الذكاء الاصطناعي</span></div>
+        <div class="lp-stage" id="lst3"><span class="lst-icon pending"></span><span class="lst-txt">احتساب النتائج</span></div>
+      </div>
+    </div>
     <!-- ── RESULTS ── -->
     <div id="resultsDiv" class="hidden">
       <div class="results-hero" id="resultsHero"></div>
@@ -1425,13 +1334,77 @@ const CROPS = {
   "الريحان":        {فئة:"توابل وعطريات",إنتاج:1.5,دورة:90, مياه:"متوسطة", تربة:["سوداء","طينية"],            أمراض:["البياض الدقيقي","الذبول"],                               زراعة:"أبريل",  حصاد_محسوب:true, عائلة:"Lamiaceae",      صعوبة:"سهل",   سعر:100000,تصدير:false},
 };
 
-// Pre-compute harvest month for every crop from planting + cycle
+// Dataset enrichment — add temp/rainfall/rotation fields from dataset
+const DATASET_EXTRA = {
+  "القمح الصلب":   {tempMin:5,  tempMax:25, rainfallMin:300, rainfallMax:600, rotationGood:["الحمص","العدس","البازلاء"],       rotationBad:["الشعير","الشوفان","القمح اللين"]},
+  "القمح اللين":   {tempMin:8,  tempMax:28, rainfallMin:400, rainfallMax:700, rotationGood:["العدس","البازلاء"],                rotationBad:["الشعير","الشوفان"]},
+  "الشعير":        {tempMin:3,  tempMax:30, rainfallMin:200, rainfallMax:500, rotationGood:["الحمص","البازلاء","العدس"],        rotationBad:["القمح الصلب","الشوفان"]},
+  "الذرة الشامية": {tempMin:18, tempMax:35, rainfallMin:400, rainfallMax:800, rotationGood:["الفول","البازلاء","الحمص"],        rotationBad:["الذرة الشامية","الدخن"]},
+  "الشوفان":       {tempMin:4,  tempMax:25, rainfallMin:300, rainfallMax:600, rotationGood:["البازلاء","الفول"],                rotationBad:["القمح الصلب","الشعير"]},
+  "الدخن":         {tempMin:25, tempMax:40, rainfallMin:150, rainfallMax:400, rotationGood:["الفول","البازلاء"],                rotationBad:["الذرة الشامية"]},
+  "الطماطم":       {tempMin:15, tempMax:32, rainfallMin:500, rainfallMax:900, rotationGood:["البصل","الجزر","الحمص","الفول"],   rotationBad:["البطاطس","الفلفل","الباذنجان"]},
+  "الفلفل":        {tempMin:18, tempMax:32, rainfallMin:500, rainfallMax:800, rotationGood:["الجزر","البصل","الحمص"],           rotationBad:["الطماطم","الباذنجان","البطاطس"]},
+  "الباذنجان":     {tempMin:18, tempMax:35, rainfallMin:400, rainfallMax:700, rotationGood:["الجزر","البصل"],                   rotationBad:["الطماطم","الفلفل"]},
+  "البطاطس":       {tempMin:10, tempMax:25, rainfallMin:400, rainfallMax:700, rotationGood:["الحمص","الفول","البازلاء","الشعير"],rotationBad:["الطماطم","الفلفل","الباذنجان"]},
+  "الجزر":         {tempMin:8,  tempMax:25, rainfallMin:300, rainfallMax:600, rotationGood:["البازلاء","الفول","الحمص"],        rotationBad:["الكرفس","الشمر"]},
+  "البصل":         {tempMin:10, tempMax:28, rainfallMin:300, rainfallMax:600, rotationGood:["البازلاء","القمح الصلب"],          rotationBad:["الثوم"]},
+  "الثوم":         {tempMin:5,  tempMax:25, rainfallMin:300, rainfallMax:500, rotationGood:["القمح الصلب","الشعير"],            rotationBad:["البصل"]},
+  "الكوسة":        {tempMin:18, tempMax:35, rainfallMin:500, rainfallMax:900, rotationGood:["الفول","الحمص"],                   rotationBad:["الخيار","البطيخ","الشمام"]},
+  "الخيار":        {tempMin:18, tempMax:35, rainfallMin:500, rainfallMax:900, rotationGood:["الفول","الحمص"],                   rotationBad:["الكوسة","البطيخ"]},
+  "الفول":         {tempMin:5,  tempMax:22, rainfallMin:300, rainfallMax:600, rotationGood:["القمح الصلب","الشعير","الذرة الشامية"],rotationBad:["الحمص","العدس"]},
+  "الحمص":         {tempMin:10, tempMax:30, rainfallMin:250, rainfallMax:500, rotationGood:["القمح الصلب","الشعير","الذرة الشامية"],rotationBad:["العدس","الفول"]},
+  "العدس":         {tempMin:5,  tempMax:28, rainfallMin:250, rainfallMax:500, rotationGood:["القمح الصلب","الشعير"],            rotationBad:["الحمص","الفول"]},
+  "البازلاء":      {tempMin:7,  tempMax:22, rainfallMin:350, rainfallMax:650, rotationGood:["القمح الصلب","الذرة الشامية"],     rotationBad:["الفول","الحمص"]},
+  "التمر":         {tempMin:20, tempMax:50, rainfallMin:0,   rainfallMax:200, rotationGood:[],                                  rotationBad:[]},
+  "الزيتون":       {tempMin:0,  tempMax:40, rainfallMin:300, rainfallMax:800, rotationGood:[],                                  rotationBad:[]},
+  "الحمضيات":      {tempMin:10, tempMax:35, rainfallMin:500, rainfallMax:900, rotationGood:[],                                  rotationBad:[]},
+  "الشمام":        {tempMin:20, tempMax:38, rainfallMin:400, rainfallMax:800, rotationGood:["الفول","الحمص"],                   rotationBad:["البطيخ","الخيار"]},
+  "البطيخ":        {tempMin:22, tempMax:38, rainfallMin:400, rainfallMax:800, rotationGood:["الفول","الحمص"],                   rotationBad:["الشمام","الخيار"]},
+  "عباد الشمس":   {tempMin:18, tempMax:35, rainfallMin:350, rainfallMax:700, rotationGood:["الحبوب","القمح الصلب"],             rotationBad:["عباد الشمس","الكتان"]},
+  "الفول السوداني":{tempMin:20, tempMax:38, rainfallMin:300, rainfallMax:700, rotationGood:["الذرة الشامية","القمح الصلب"],     rotationBad:[]},
+  "البرسيم":       {tempMin:5,  tempMax:28, rainfallMin:350, rainfallMax:700, rotationGood:["القمح الصلب","الشعير","الذرة الشامية"],rotationBad:[]},
+  "الكمون":        {tempMin:15, tempMax:35, rainfallMin:200, rainfallMax:500, rotationGood:["الحبوب"],                          rotationBad:["الكزبرة","الشمر"]},
+  "الكزبرة":       {tempMin:10, tempMax:30, rainfallMin:200, rainfallMax:500, rotationGood:["الحبوب"],                          rotationBad:["الكمون","الشمر"]},
+  "الزعفران":      {tempMin:10, tempMax:25, rainfallMin:300, rainfallMax:600, rotationGood:[],                                  rotationBad:[]},
+  "الفراولة":      {tempMin:10, tempMax:25, rainfallMin:500, rainfallMax:900, rotationGood:["البازلاء","الخس"],                 rotationBad:["الفراولة"]},
+  "الرمان":        {tempMin:15, tempMax:42, rainfallMin:200, rainfallMax:600, rotationGood:[],                                  rotationBad:[]},
+  "اللوز":         {tempMin:5,  tempMax:38, rainfallMin:200, rainfallMax:600, rotationGood:[],                                  rotationBad:[]},
+};
+
+// Enrich WILAYAS with avgRainfall from dataset
+const WILAYA_RAIN = {
+  "أدرار":50,"الشلف":450,"الأغواط":200,"أم البواقي":400,"باتنة":380,"بجاية":800,
+  "بسكرة":180,"بشار":80,"البليدة":700,"البويرة":750,"تمنراست":30,"تبسة":350,
+  "تلمسان":420,"تيارت":400,"تيزي وزو":900,"الجزائر":600,"الجلفة":250,"جيجل":1100,
+  "سطيف":450,"سعيدة":380,"سكيكدة":650,"سيدي بلعباس":400,"عنابة":700,"قالمة":680,
+  "قسنطينة":520,"المدية":550,"مستغانم":420,"المسيلة":280,"معسكر":450,"ورقلة":60,
+  "وهران":400,"البيض":220,"إليزي":25,"برج بوعريريج":480,"بومرداس":580,"الطارف":720,
+  "تندوف":40,"تيسمسيلت":420,"الوادي":90,"خنشلة":420,"سوق أهراس":650,"تيبازة":620,
+  "ميلة":500,"عين الدفلى":520,"النعامة":180,"عين تيموشنت":410,"غرداية":100,"رليزان":380,
+  "تيميمون":45,"برج باجي مختار":35,"أولاد جلال":150,"بني عباس":55,"عين صالح":30,
+  "عين قزام":20,"تقرت":85,"جانت":15,"المغير":95,"المنيعة":50
+};
+for(const [w, d] of Object.entries(WILAYAS)) {
+  d.avgRainfall = WILAYA_RAIN[w] || 300;
+}
+
+// Pre-compute harvest month + dataset enrichment
 for(const [name, d] of Object.entries(CROPS)) {
   const plantIdx = MONTHS_AR.indexOf(d.زراعة);
   if(plantIdx >= 0) {
     const harvestIdx = computeHarvestMonth(plantIdx, d.دورة);
-    d.حصاد = MONTHS_AR[harvestIdx]; // computed harvest month (consistent!)
+    d.حصاد = MONTHS_AR[harvestIdx];
     d.plantIdx = plantIdx;
+  }
+  // Inject dataset extra fields
+  const extra = DATASET_EXTRA[name];
+  if(extra) {
+    d.tempMin = extra.tempMin;
+    d.tempMax = extra.tempMax;
+    d.rainfallMin = extra.rainfallMin;
+    d.rainfallMax = extra.rainfallMax;
+    d.rotationGood = extra.rotationGood;
+    d.rotationBad  = extra.rotationBad;
   }
 }
 
@@ -1606,7 +1579,15 @@ function ruleScore(cropData, wd, st) {
   const wdiff = Math.abs(userW - cropW);
   if(wdiff===0) score+=25; else if(wdiff===1) score+=15; else score+=4;
 
-  if((cropData.تربة||[]).includes(wd.تربة)) score+=25; else score+=7;
+  if((cropData.تربة||[]).includes(wd.تربة)) score+=25; else score+=5;
+
+  // Rainfall check using dataset values
+  if(cropData.rainfallMin !== undefined && wd.avgRainfall !== undefined) {
+    const r = wd.avgRainfall;
+    if(r >= cropData.rainfallMin && r <= cropData.rainfallMax) score += 8;
+    else if(r >= cropData.rainfallMin*0.6) score += 4;
+    else score += 0; // clear mismatch
+  } else score += 4;
 
   // HARD timing rule — season score with penalty
   const pen = timingPenalty(cropData.plantIdx, st.plantMonthIdx);
@@ -1614,7 +1595,7 @@ function ruleScore(cropData, wd, st) {
 
   const diffMap={"سهل":0,"متوسط":1,"خبير":2}, expMap={"مبتدئ":0,"متوسط":1,"خبير":2};
   const cd=diffMap[cropData.صعوبة]||0, ue=expMap[st.experience]||0;
-  if(ue>=cd) score+=15; else if(ue===cd-1) score+=10; else score+=2;
+  if(ue>=cd) score+=12; else if(ue===cd-1) score+=8; else score+=1;
 
   if(st.goal==="تصدير"&&cropData.تصدير) score+=10;
   else if(st.goal==="بيع"&&cropData.إنتاج>=5) score+=10;
@@ -1623,56 +1604,97 @@ function ruleScore(cropData, wd, st) {
 
   if(wd.منطقة.includes("صحراوية")&&(cropData.مياه==="منخفضة جداً"||cropData.مياه==="منخفضة")) score+=5;
   else if(wd.منطقة.includes("شمالية")&&cropData.مياه==="عالية") score+=5;
-  else score+=3;
+  else score+=2;
 
   return Math.min(Math.max(score, 0), 100);
 }
 
 function mlScore(cropData, wd, st, weatherTemp) {
+  // ── Enhanced ML using dataset fields: temp_min/max, rainfall_min/max, rotation ──
   const wmap = {"منخفضة جداً":0,"منخفضة":0.33,"متوسطة":0.66,"عالية":1.0};
-  const soilMatch = (cropData.تربة||[]).includes(wd.تربة) ? 1.0 : 0.18;
-  const waterSim  = 1 - Math.abs((wmap[st.water]||.5) - (wmap[cropData.مياه]||.5));
-  const yieldN    = Math.min(cropData.إنتاج/40, 1.0);
-  const timePen   = timingPenalty(cropData.plantIdx, st.plantMonthIdx) / 100;
-  const seasonFit = Math.max(0, 1 - timePen * 1.4);  // ML also respects timing hard
-  const regionFit = regionScore(wd.منطقة, cropData);
-  const tempFit   = weatherTemp ? tempScore(weatherTemp, cropData) : 0.7;
-  const diffMap   = {"سهل":1.0,"متوسط":0.7,"خبير":0.4};
-  const expMap2   = {"مبتدئ":0.3,"متوسط":0.7,"خبير":1.0};
-  const expFit    = Math.max(0, 1 - Math.abs((expMap2[st.experience]||.5)-(1-(diffMap[cropData.صعوبة]||.5))));
-  const goalFit   = goalScore(st.goal, cropData);
-  const rainFit   = rainScore(wd.أمطار, cropData);
 
+  // Soil compatibility (uses actual suitable_soils list from dataset)
+  const soilMatch = (cropData.تربة||[]).includes(wd.تربة) ? 1.0 : 0.12;
+
+  // Water match
+  const waterSim = 1 - Math.abs((wmap[st.water]||.5) - (wmap[cropData.مياه]||.5));
+
+  // Yield normalised (log scale to avoid huge crops dominating)
+  const yieldN = Math.min(Math.log1p(cropData.إنتاج) / Math.log1p(50), 1.0);
+
+  // Timing penalty (hard respect of season)
+  const pen = timingPenalty(cropData.plantIdx, st.plantMonthIdx);
+  const seasonFit = Math.max(0, 1 - pen / 30);
+
+  // Temperature fitness using dataset temp_min/max fields
+  let tempFit = 0.65;
+  if (weatherTemp !== null && cropData.tempMin !== undefined && cropData.tempMax !== undefined) {
+    if (weatherTemp >= cropData.tempMin && weatherTemp <= cropData.tempMax) {
+      tempFit = 1.0;
+    } else {
+      const overshoot = Math.max(0, weatherTemp - cropData.tempMax, cropData.tempMin - weatherTemp);
+      tempFit = Math.max(0.1, 1 - overshoot / 15);
+    }
+  }
+
+  // Rainfall fitness using dataset rainfall_min/max fields
+  let rainFit = 0.6;
+  if (cropData.rainfallMin !== undefined && wd.avgRainfall !== undefined) {
+    const r = wd.avgRainfall;
+    if (r >= cropData.rainfallMin && r <= cropData.rainfallMax) {
+      rainFit = 1.0;
+    } else {
+      const gap = Math.max(0, cropData.rainfallMin - r, r - cropData.rainfallMax);
+      rainFit = Math.max(0.1, 1 - gap / 400);
+    }
+  }
+
+  // Rotation bonus using dataset rotation_good_with
+  let rotBonus = 0;
+  if (st.prevCrop && cropData.rotationGood) {
+    if (cropData.rotationGood.includes(st.prevCrop)) rotBonus = 0.12;
+    else if (cropData.rotationBad && cropData.rotationBad.some(b => b.includes(st.prevCrop) || st.prevCrop.includes(b))) rotBonus = -0.15;
+  }
+
+  // Region fit
+  const regionFit = regionScore(wd.منطقة, cropData);
+
+  // Experience fit
+  const diffMap = {"سهل":1.0,"متوسط":0.7,"خبير":0.4};
+  const expMap2 = {"مبتدئ":0.3,"متوسط":0.7,"خبير":1.0};
+  const expFit = Math.max(0, 1 - Math.abs((expMap2[st.experience]||.5)-(1-(diffMap[cropData.صعوبة]||.5))));
+
+  // Goal fit
+  const goalFit = goalScore(st.goal, cropData);
+
+  // Final weighted score
   const raw = (
-    soilMatch * .22 + waterSim * .18 + yieldN * .12 +
-    seasonFit * .18 + regionFit * .10 + tempFit * .08 +
-    expFit * .06 + goalFit * .04 + rainFit * .02
-  );
+    soilMatch  * 0.22 +
+    waterSim   * 0.17 +
+    seasonFit  * 0.18 +
+    yieldN     * 0.10 +
+    tempFit    * 0.10 +
+    rainFit    * 0.08 +
+    regionFit  * 0.07 +
+    expFit     * 0.05 +
+    goalFit    * 0.03
+  ) + rotBonus;
+
   return Math.round(Math.min(Math.max(raw, 0), 1) * 100);
 
   function regionScore(r, d) {
-    if(r.includes("صحراوية")&&(d.مياه==="منخفضة جداً"||d.مياه==="منخفضة")) return 1.0;
-    if(r.includes("شمالية")&&d.مياه==="عالية") return 1.0;
-    if(r.includes("صحراوية")&&d.مياه==="عالية") return 0.25;
+    if(r.includes("صحراوية") && (d.مياه==="منخفضة جداً"||d.مياه==="منخفضة")) return 1.0;
+    if(r.includes("شمالية") && d.مياه==="عالية") return 1.0;
+    if(r.includes("صحراوية") && d.مياه==="عالية") return 0.2;
+    if(r.includes("شبه صحراوية") && (d.مياه==="منخفضة"||d.مياه==="متوسطة")) return 0.85;
     return 0.6;
   }
-  function tempScore(t, d) {
-    if(d.مياه==="منخفضة جداً"){ return t>30?1.0:t>22?.8:.5; }
-    if(d.مياه==="عالية")      { return (t>=15&&t<=28)?1.0:(t>35||t<10)?.35:.7; }
-    return (t>=15&&t<=30)?.9:(t>38||t<8)?.35:.7;
-  }
   function goalScore(g, d) {
-    if(g==="تصدير") return d.تصدير?1.0:.3;
-    if(g==="بيع")   return Math.min(d.إنتاج/30, 1.0);
-    return .8;
-  }
-  function rainScore(rain, d) {
-    const rm={"جافة جداً":0,"جافة":.25,"متوسطة":.55,"عالية":.8,"عالية جداً":1.0};
-    const wm={"منخفضة جداً":0,"منخفضة":.25,"متوسطة":.55,"عالية":1.0};
-    return 1 - Math.abs((rm[rain]||.5)-(wm[d.مياه]||.5));
+    if(g==="تصدير") return d.تصدير ? 1.0 : 0.25;
+    if(g==="بيع")   return Math.min(Math.log1p(d.إنتاج) / Math.log1p(40), 1.0);
+    return 0.8;
   }
 }
-
 function hybridScore(rs, ms) { return Math.round(rs * 0.58 + ms * 0.42); }
 
 // ════════════════════════════════════════════════════════════
@@ -1785,19 +1807,32 @@ async function generateRecommendations() {
   for(let i=1;i<=8;i++) document.getElementById(`step${i}`).classList.add('hidden');
   document.getElementById('resultsDiv').classList.add('hidden');
   const ld = document.getElementById('loadingDiv');
-  ld.classList.add('show');
+  ld.classList.remove('hidden');
   updateStepper(9);
 
-  // Animate progress bar
-  const progressBar = document.getElementById('loadingProgress');
-  let progress = 0;
-  const progressInterval = setInterval(() => {
-    progress += Math.random() * 15;
-    if(progress > 90) progress = 90;
-    progressBar.style.width = progress + '%';
-  }, 300);
+  // Stage animation helper
+  function setStage(idx, status) {
+    const el = document.getElementById(`lst${idx}`);
+    if(!el) return;
+    const icon = el.querySelector('.lst-icon');
+    el.classList.remove('done','active-s');
+    icon.classList.remove('pending','in-prog','done');
+    if(status === 'done')   { icon.classList.add('done');    el.classList.add('done'); }
+    if(status === 'active') { icon.classList.add('in-prog'); el.classList.add('active-s'); }
+    if(status === 'wait')   { icon.classList.add('pending'); }
+  }
+  function setProgress(pct) {
+    const ring = document.getElementById('lp-ring');
+    const pctEl = document.getElementById('lpPct');
+    if(ring) ring.setAttribute('stroke-dashoffset', (314 * (1 - pct/100)).toFixed(1));
+    if(pctEl) pctEl.textContent = Math.round(pct) + '%';
+  }
 
-  // Fetch weather
+  // Init stages
+  setStage(0,'active'); setStage(1,'wait'); setStage(2,'wait'); setStage(3,'wait');
+  setProgress(10);
+
+  // Fetch weather (stage 0)
   let wTemp = null;
   try {
     const wd2 = WILAYAS[state.wilaya];
@@ -1805,10 +1840,15 @@ async function generateRecommendations() {
     if(r.ok){ const d=await r.json(); wTemp=d.current?.temperature_2m; }
   } catch(e){}
 
-  clearInterval(progressInterval);
-  progressBar.style.width = '100%';
+  setStage(0,'done'); setProgress(30);
+  await sleep(200);
+  setStage(1,'active'); setProgress(45);
+  await sleep(300);
+  setStage(1,'done'); setProgress(60);
+  setStage(2,'active'); setProgress(70);
+  await sleep(400);
 
-  const wd = WILAYAS[state.wilaya];
+    const wd = WILAYAS[state.wilaya];
   const scored = [];
 
   for(const [crop, d] of Object.entries(CROPS)) {
@@ -1836,14 +1876,29 @@ async function generateRecommendations() {
 
   scored.sort((a,b)=> b.score!==a.score ? b.score-a.score : b.yield-a.yield);
 
-  // Top 5 with family diversity
-  const top5=[]; const usedFam=new Set();
+  // Top 5 — enforce both family AND category diversity to prevent duplicate results
+  const top5=[]; const usedFam=new Set(); const usedCat=new Set();
+  // Pass 1: strict diversity (different family AND category)
   for(const item of scored){
     if(top5.length>=5) break;
     const fam=item.d.عائلة||'';
-    if(!usedFam.has(fam)||top5.length>=3){ top5.push(item); usedFam.add(fam); }
+    const cat=item.d.فئة||'';
+    if(!usedFam.has(fam) && !usedCat.has(cat)){
+      top5.push(item); usedFam.add(fam); usedCat.add(cat);
+    }
   }
-  for(const item of scored){ if(top5.length>=5) break; if(!top5.includes(item)) top5.push(item); }
+  // Pass 2: relax category constraint (different family only)
+  for(const item of scored){
+    if(top5.length>=5) break;
+    if(top5.includes(item)) continue;
+    const fam=item.d.عائلة||'';
+    if(!usedFam.has(fam)){ top5.push(item); usedFam.add(fam); }
+  }
+  // Pass 3: fill remaining slots with best non-duplicate crops (different name)
+  for(const item of scored){
+    if(top5.length>=5) break;
+    if(!top5.includes(item)) top5.push(item);
+  }
 
   // If no results after hard filtering, show best available without plantable window restriction
   if(top5.length === 0) {
@@ -1862,8 +1917,20 @@ async function generateRecommendations() {
     top5.push(...scored.slice(0,5));
   }
 
+  setStage(2,'done'); setProgress(85);
+  setStage(3,'active');
+  await sleep(200);
+  setStage(3,'done'); setProgress(100);
+  setStage(2,'done'); setProgress(85);
+  setStage(3,'active');
+  await sleep(250);
+  setStage(3,'done'); setProgress(100);
+  setStage(2,'done'); setProgress(85);
+  setStage(3,'active');
+  await sleep(250);
+  setStage(3,'done'); setProgress(100);
   await sleep(350);
-  ld.classList.remove('show');
+  ld.classList.add('hidden');
   renderResults(top5, wTemp);
 }
 
